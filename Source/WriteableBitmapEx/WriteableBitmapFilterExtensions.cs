@@ -38,7 +38,7 @@ namespace System.Windows.Media.Imaging
         ///<summary>
         /// Gaussian blur kernel with the size 5x5
         ///</summary>
-        public static int[,] KernelGaussianBlur5x5 = {
+        public static int[,] KernelGaussianBlur5x5 { get; } = {
                                                        {1,  4,  7,  4, 1},
                                                        {4, 16, 26, 16, 4},
                                                        {7, 26, 41, 26, 7},
@@ -49,7 +49,7 @@ namespace System.Windows.Media.Imaging
         ///<summary>
         /// Gaussian blur kernel with the size 3x3
         ///</summary>
-        public static int[,] KernelGaussianBlur3x3 = {
+        public static int[,] KernelGaussianBlur3x3 { get; } = {
                                                        {16, 26, 16},
                                                        {26, 41, 26},
                                                        {16, 26, 16}
@@ -58,7 +58,7 @@ namespace System.Windows.Media.Imaging
         ///<summary>
         /// Sharpen kernel with the size 3x3
         ///</summary>
-        public static int[,] KernelSharpen3x3 = {
+        public static int[,] KernelSharpen3x3 { get; } = {
                                                  { 0, -2,  0},
                                                  {-2, 11, -2},
                                                  { 0, -2,  0}

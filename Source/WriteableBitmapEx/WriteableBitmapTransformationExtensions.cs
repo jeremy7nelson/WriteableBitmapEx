@@ -88,7 +88,7 @@ namespace System.Windows.Media.Imaging
         {
             var numberOfChannels = bmp.BackBufferStride / bmp.PixelWidth;
             if (numberOfChannels != SizeOfArgb)
-                throw new Exception("The format of this image is not supported, Consider calling BitmapFactory.ConvertToPbgra32Format()");
+                throw new NotSupportedException("The format of this image is not supported, Consider calling BitmapFactory.ConvertToPbgra32Format()");
 
 
             using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))

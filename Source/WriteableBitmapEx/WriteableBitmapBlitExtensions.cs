@@ -35,10 +35,6 @@ namespace System.Windows.Media.Imaging
 #endif
  static partial class WriteableBitmapExtensions
     {
-        private const int WhiteR = 255;
-        private const int WhiteG = 255;
-        private const int WhiteB = 255;
-
         #region Enum
 
         /// <summary>

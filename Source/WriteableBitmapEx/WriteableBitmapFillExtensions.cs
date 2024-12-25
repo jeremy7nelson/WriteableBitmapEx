@@ -547,7 +547,7 @@ namespace System.Windows.Media.Imaging
         /// The following is always true: 
         /// <code>edge.StartY &lt; edge.EndY</code>
         /// </remarks>
-        private class Edge : IComparable<Edge>
+        private sealed class Edge : IComparable<Edge>
         {
             /// <summary>
             /// X coordinate of starting point of edge.

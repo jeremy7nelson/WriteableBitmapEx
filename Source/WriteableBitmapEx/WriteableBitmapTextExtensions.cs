@@ -261,7 +261,7 @@ namespace System.Windows.Media.Imaging
 
                     if (!flag)
                     {
-                        throw new Exception("Error in rendering text, PathSegment type not supported");
+                        throw new NotSupportedException("Error in rendering text, PathSegment type not supported");
                     }
                 }
             }
