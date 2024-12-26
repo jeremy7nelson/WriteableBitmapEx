@@ -169,7 +169,7 @@ namespace System.Windows.Media.Imaging
         /// <returns>A new WriteableBitmap containing the pixel data.</returns>
         public static WriteableBitmap FromResource(string relativePath)
         {
-            var fullName = Assembly.GetCallingAssembly().FullName;
+            var fullName = Assembly.GetCallingAssembly().FullName ?? throw new ArgumentException("Assembly FullName is null");
             var asmName = new AssemblyName(fullName).Name;
             return FromContent(asmName + ";component/" + relativePath);
         }

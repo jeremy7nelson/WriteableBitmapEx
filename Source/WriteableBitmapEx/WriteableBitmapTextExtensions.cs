@@ -83,7 +83,6 @@ namespace System.Windows.Media.Imaging
 
         #endregion
 
-
         #region Draw Text
 
         /// <summary>
@@ -94,12 +93,11 @@ namespace System.Windows.Media.Imaging
         /// <param name="x">The x-coordinate of the text origin</param>
         /// <param name="y">The y-coordinate of the text origin</param>
         /// <param name="color">the color.</param>
-        public static void DrawText(this WriteableBitmap bmp, FormattedText formattedText, int x, int y, Color col)
+        public static void DrawText(this WriteableBitmap bmp, FormattedText formattedText, int x, int y, Color color)
         {
             var _textGeometry = formattedText.BuildGeometry(new System.Windows.Point(x, y));
-            DrawGeometry(bmp, _textGeometry, col);
+            DrawGeometry(bmp, _textGeometry, color);
         }
-
 
         /// <summary>
         /// Draws an outlined text.
@@ -122,13 +120,12 @@ namespace System.Windows.Media.Imaging
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="geometry">The geometry to be rendered</param>
         /// <param name="color">the color.</param>
-        private static void DrawGeometry(WriteableBitmap bmp, Geometry geometry, Color col)
+        private static void DrawGeometry(WriteableBitmap bmp, Geometry geometry, Color color)
         {
-
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
-                    DrawGeometry(bmp, itm, col);
+                    DrawGeometry(bmp, itm, color);
             }
             else if (geometry is PathGeometry pg)
             {
@@ -143,15 +140,12 @@ namespace System.Windows.Media.Imaging
                 }
 
                 foreach (var item in polygons)
-                    bmp.DrawPolyline(item, col);
-
+                    bmp.DrawPolyline(item, color);
             }
-
         }
 
         private static void DrawGeometryAa(WriteableBitmap bmp, Geometry geometry, Color col, int thickness)
         {
-
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
@@ -171,14 +165,10 @@ namespace System.Windows.Media.Imaging
 
                 foreach (var item in polygons)
                     bmp.DrawPolylineAa(item, col, thickness);
-
             }
-
         }
 
         #endregion
-
-
 
         #region Common
 
@@ -265,12 +255,9 @@ namespace System.Windows.Media.Imaging
                     }
                 }
             }
-
         }
 
         #endregion
-
-
 
         #endregion
     }

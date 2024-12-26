@@ -132,14 +132,13 @@ namespace System.Windows.Media.Imaging
             }
         }
 
-
-
         /// <summary>
         /// Draws a polyline anti-aliased. Add the first point also at the end of the array if the line should be closed.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="points">The points of the polyline in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
         /// <param name="color">The color for the line.</param>
+        /// <param name="thickness">The thickness for the line.</param>
         public static void DrawPolylineAa(this WriteableBitmap bmp, int[] points, int color, int thickness)
         {
             using (var context = bmp.GetBitmapContext())

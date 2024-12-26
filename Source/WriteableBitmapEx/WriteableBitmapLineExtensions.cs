@@ -579,13 +579,12 @@ namespace System.Windows.Media.Imaging
         /// Draws a line using a pen / stamp for the line 
         /// </summary>
         /// <param name="bmp">The WriteableBitmap containing the pixels as int RGBA value.</param>
-        /// <param name="w">The width of one scanline in the pixels array.</param>
-        /// <param name="h">The height of the bitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
         /// <param name="y1">The y-coordinate of the start point.</param>
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="penBmp">The pen bitmap.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLinePenned(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, WriteableBitmap penBmp, Rect? clipRect = null)
         {
             using (var context = bmp.GetBitmapContext())
@@ -608,6 +607,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="pen">The pen context.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLinePenned(BitmapContext context, int w, int h, int x1, int y1, int x2, int y2, BitmapContext pen, Rect? clipRect = null)
         {
             // Edge case where lines that went out of vertical bounds clipped instead of disappearing
@@ -1146,12 +1146,15 @@ namespace System.Windows.Media.Imaging
         /// <summary> 
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
+        /// <param name="pixelWidth">The width of one scanline in the pixels array.</param>
+        /// <param name="pixelHeight">The height of the bitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
         /// <param name="y1">The y-coordinate of the start point.</param>
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="strokeThickness">The stroke thickness of the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary>
         public static void DrawLineAa(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, int strokeThickness, Rect? clipRect = null)
         {
@@ -1167,6 +1170,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="strokeThickness">The stroke thickness of the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary>
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, int strokeThickness, Rect? clipRect = null)
         {
@@ -1179,12 +1183,15 @@ namespace System.Windows.Media.Imaging
         /// <summary> 
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
+        /// <param name="pixelWidth">The width of one scanline in the pixels array.</param>
+        /// <param name="pixelHeight">The height of the bitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
         /// <param name="y1">The y-coordinate of the start point.</param>
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="strokeThickness">The stroke thickness of the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary>
         public static void DrawLineAa(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, Color color, int strokeThickness, Rect? clipRect = null)
         {
@@ -1201,6 +1208,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="strokeThickness">The stroke thickness of the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary>
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, Color color, int strokeThickness, Rect? clipRect = null)
         {
@@ -1220,6 +1228,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary> 
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, Color color, Rect? clipRect = null)
         {
@@ -1236,6 +1245,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary> 
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
@@ -1256,6 +1266,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="x2">The x-coordinate of the end point.</param>
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
+        /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         /// </summary> 
         public static void DrawLineAa(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
