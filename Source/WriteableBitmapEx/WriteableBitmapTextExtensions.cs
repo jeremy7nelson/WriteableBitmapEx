@@ -14,9 +14,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
-
 #if NETFX_CORE
 namespace Windows.UI.Xaml.Media.Imaging
 #else
@@ -46,7 +43,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">the color.</param>
         public static void FillText(this WriteableBitmap bmp, FormattedText formattedText, int x, int y, Color color)
         {
-            var _textGeometry = formattedText.BuildGeometry(new System.Windows.Point(x, y));
+            var _textGeometry = formattedText.BuildGeometry(new Point(x, y));
             FillGeometry(bmp, _textGeometry, color);
         }
 
@@ -95,7 +92,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">the color.</param>
         public static void DrawText(this WriteableBitmap bmp, FormattedText formattedText, int x, int y, Color color)
         {
-            var _textGeometry = formattedText.BuildGeometry(new System.Windows.Point(x, y));
+            var _textGeometry = formattedText.BuildGeometry(new Point(x, y));
             DrawGeometry(bmp, _textGeometry, color);
         }
 
@@ -110,7 +107,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="thickness">the thickness.</param>
         public static void DrawTextAa(this WriteableBitmap bmp, FormattedText formattedText, int x, int y, Color color, int thickness)
         {
-            var _textGeometry = formattedText.BuildGeometry(new System.Windows.Point(x, y));
+            var _textGeometry = formattedText.BuildGeometry(new Point(x, y));
             DrawGeometryAa(bmp, _textGeometry, color, thickness);
         }
 

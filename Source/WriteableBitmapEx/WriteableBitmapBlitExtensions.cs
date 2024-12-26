@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 #if NETFX_CORE
 using Windows.Foundation;
 

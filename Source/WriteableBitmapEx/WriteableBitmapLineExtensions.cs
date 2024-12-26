@@ -16,9 +16,6 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
-
 #if NETFX_CORE
 using Windows.Foundation;
 
@@ -1001,8 +998,8 @@ namespace System.Windows.Media.Imaging
             const short NUM_LEVELS = 1 << INTENSITY_BITS; // 256
             // mask used to compute 1-value by doing (value XOR mask)
             const ushort WEIGHT_COMPLEMENT_MASK = NUM_LEVELS - 1; // 255
-            // # of bits by which to shift ErrorAcc to get intensity level 
-            const ushort INTENSITY_SHIFT = (ushort)(16 - INTENSITY_BITS); // 8
+            // # of bits by which to shift ErrorAcc to get intensity level
+            const ushort INTENSITY_SHIFT = 16 - INTENSITY_BITS; // 8
 
             ushort ErrorAdj, ErrorAcc;
             ushort ErrorAccTemp, Weighting;

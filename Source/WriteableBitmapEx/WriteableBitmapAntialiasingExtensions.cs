@@ -15,7 +15,6 @@
 //   This code is open source. Please read the License.txt for details. No worries, we won't sue you! ;)
 //
 #endregion
-using System;
 
 #if NETFX_CORE
 using Windows.Foundation;

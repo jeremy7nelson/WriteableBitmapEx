@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 #if NETFX_CORE
 using Windows.Foundation;
 
@@ -384,7 +382,7 @@ namespace System.Windows.Media.Imaging
                 }
                 else
                 {
-                    result = WriteableBitmapExtensions.Clone(bmp);
+                    result = Clone(bmp);
                 }
                 return result;
             }

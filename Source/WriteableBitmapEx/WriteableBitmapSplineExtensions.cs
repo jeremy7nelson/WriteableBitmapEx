@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 #if NETFX_CORE
 namespace Windows.UI.Xaml.Media.Imaging
 #else

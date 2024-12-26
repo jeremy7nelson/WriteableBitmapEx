@@ -16,8 +16,8 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Runtime;
 
 #if NETFX_CORE
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -61,8 +61,8 @@ namespace System.Windows.Media.Imaging
         private readonly int _pixelHeight;
 
 #if WPF
-      private readonly static IDictionary<WriteableBitmap, int> UpdateCountByBmp = new System.Collections.Concurrent.ConcurrentDictionary<WriteableBitmap, int>();
-      private readonly static IDictionary<WriteableBitmap, BitmapContextBitmapProperties> BitmapPropertiesByBmp = new System.Collections.Concurrent.ConcurrentDictionary<WriteableBitmap, BitmapContextBitmapProperties>();
+      private readonly static IDictionary<WriteableBitmap, int> UpdateCountByBmp = new ConcurrentDictionary<WriteableBitmap, int>();
+      private readonly static IDictionary<WriteableBitmap, BitmapContextBitmapProperties> BitmapPropertiesByBmp = new ConcurrentDictionary<WriteableBitmap, BitmapContextBitmapProperties>();
 
       private readonly int _length;
       private readonly int* _backBuffer;
@@ -353,7 +353,7 @@ namespace System.Windows.Media.Imaging
       /// </summary>
       public unsafe int* Pixels
       {
-         [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+         [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
          get { return _backBuffer; }
       }
 
@@ -362,7 +362,7 @@ namespace System.Windows.Media.Imaging
       /// </summary>
       public PixelFormat Format
       {
-          [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+          [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
           get { return _format; }
       }
 
@@ -372,7 +372,7 @@ namespace System.Windows.Media.Imaging
       /// </summary>
       public int Length
       {
-         [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+         [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
          get
          {
             return _length;
@@ -383,7 +383,7 @@ namespace System.Windows.Media.Imaging
       /// Performs a Copy operation from source to destination BitmapContext
       /// </summary>
       /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(BitmapContext src, int srcOffset, BitmapContext dest, int destOffset, int count)
       {
          NativeMethods.CopyUnmanagedMemory((byte*)src.Pixels, srcOffset, (byte*)dest.Pixels, destOffset, count);
@@ -393,7 +393,7 @@ namespace System.Windows.Media.Imaging
       /// Performs a Copy operation from source Array to destination BitmapContext
       /// </summary>
       /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(int[] src, int srcOffset, BitmapContext dest, int destOffset, int count)
       {
          fixed (int* srcPtr = src)
@@ -406,7 +406,7 @@ namespace System.Windows.Media.Imaging
       /// Performs a Copy operation from source Array to destination BitmapContext
       /// </summary>
       /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(byte[] src, int srcOffset, BitmapContext dest, int destOffset, int count)
       {
          fixed (byte* srcPtr = src)
@@ -419,7 +419,7 @@ namespace System.Windows.Media.Imaging
       /// Performs a Copy operation from source BitmapContext to destination Array
       /// </summary>
       /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(BitmapContext src, int srcOffset, byte[] dest, int destOffset, int count)
       {
          fixed (byte* destPtr = dest)
@@ -432,7 +432,7 @@ namespace System.Windows.Media.Imaging
       /// Performs a Copy operation from source BitmapContext to destination Array
       /// </summary>
       /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(BitmapContext src, int srcOffset, int[] dest, int destOffset, int count)
       {
          fixed (int* destPtr = dest)
@@ -444,7 +444,7 @@ namespace System.Windows.Media.Imaging
       /// <summary>
       /// Clears the BitmapContext, filling the underlying bitmap with zeros
       /// </summary>
-      [System.Runtime.TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public void Clear()
       {
          NativeMethods.SetUnmanagedMemory((IntPtr)_backBuffer, 0, _backBufferStride * _pixelHeight);

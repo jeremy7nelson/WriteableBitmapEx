@@ -16,9 +16,7 @@
 //
 #endregion
 
-using System;
 using System.IO;
-using System.Reflection;
 
 #if NETFX_CORE
 using Windows.ApplicationModel.Resources;
@@ -172,7 +170,7 @@ namespace System.Windows.Media.Imaging
 
                         // Scale inverse alpha to use cheap integer mul bit shift
                         ai = ((255 << 8) / ai);
-                        data[offsetDest + 3] = (byte)a;                                // A
+                        data[offsetDest + 3] = a;                                      // A
                         data[offsetDest + 2] = (byte)((((c >> 16) & 0xFF) * ai) >> 8); // R
                         data[offsetDest + 1] = (byte)((((c >> 8) & 0xFF) * ai) >> 8);  // G
                         data[offsetDest] = (byte)((((c & 0xFF) * ai) >> 8));           // B
