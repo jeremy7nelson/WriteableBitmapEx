@@ -103,8 +103,8 @@ namespace System.Windows.Media.Imaging
                         var t1 = 1 - t;
                         var t1Sq = t1 * t1;
 
-                        tx2 = (int)(t1 * t1Sq * x1 + 3 * t * t1Sq * cx1 + 3 * t1 * tSq * cx2 + t * tSq * x2);
-                        ty2 = (int)(t1 * t1Sq * y1 + 3 * t * t1Sq * cy1 + 3 * t1 * tSq * cy2 + t * tSq * y2);
+                        tx2 = (int)((t1 * t1Sq * x1) + (3 * t * t1Sq * cx1) + (3 * t1 * tSq * cx2) + (t * tSq * x2));
+                        ty2 = (int)((t1 * t1Sq * y1) + (3 * t * t1Sq * cy1) + (3 * t1 * tSq * cy2) + (t * tSq * y2));
 
                         // Draw line
                         DrawLine(context, w, h, tx1, ty1, tx2, ty2, color);
@@ -205,18 +205,18 @@ namespace System.Windows.Media.Imaging
                 var sy1 = tension * (y3 - y1);
                 var sx2 = tension * (x4 - x2);
                 var sy2 = tension * (y4 - y2);
-                var ax = sx1 + sx2 + 2 * x2 - 2 * x3;
-                var ay = sy1 + sy2 + 2 * y2 - 2 * y3;
-                var bx = -2 * sx1 - sx2 - 3 * x2 + 3 * x3;
-                var by = -2 * sy1 - sy2 - 3 * y2 + 3 * y3;
+                var ax = sx1 + sx2 + (2 * x2) - (2 * x3);
+                var ay = sy1 + sy2 + (2 * y2) - (2 * y3);
+                var bx = (-2 * sx1) - sx2 - (3 * x2) + (3 * x3);
+                var by = (-2 * sy1) - sy2 - (3 * y2) + (3 * y3);
 
                 // Interpolate
                 for (var t = step; t <= 1; t += step)
                 {
                     var tSq = t * t;
 
-                    tx2 = (int)(ax * tSq * t + bx * tSq + sx1 * t + x2);
-                    ty2 = (int)(ay * tSq * t + by * tSq + sy1 * t + y2);
+                    tx2 = (int)((ax * tSq * t) + (bx * tSq) + (sx1 * t) + x2);
+                    ty2 = (int)((ay * tSq * t) + (by * tSq) + (sy1 * t) + y2);
 
                     // Draw line
                     DrawLine(context, w, h, tx1, ty1, tx2, ty2, color);

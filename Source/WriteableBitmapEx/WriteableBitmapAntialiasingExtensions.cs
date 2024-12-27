@@ -108,17 +108,17 @@ namespace System.Windows.Media.Imaging
                         gs = g;
                         bs = b;
 
-                        d = buffer[y * width + x];
+                        d = buffer[(y * width) + x];
 
                         rd = (byte)((d & 0x00ff0000) >> 16);
                         gd = (byte)((d & 0x0000ff00) >> 8);
                         bd = (byte)((d & 0x000000ff) >> 0);
 
-                        rd = (byte)((rs * a + rd * (0xff - a)) >> 8);
-                        gd = (byte)((gs * a + gd * (0xff - a)) >> 8);
-                        bd = (byte)((bs * a + bd * (0xff - a)) >> 8);
+                        rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
+                        gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
+                        bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
 
-                        buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                        buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
                     }
                 }
 
@@ -187,17 +187,17 @@ namespace System.Windows.Media.Imaging
                         gs = g;
                         bs = b;
 
-                        d = buffer[y * width + x];
+                        d = buffer[(y * width) + x];
 
                         rd = (byte)((d & 0x00ff0000) >> 16);
                         gd = (byte)((d & 0x0000ff00) >> 8);
                         bd = (byte)((d & 0x000000ff) >> 0);
 
-                        rd = (byte)((rs * a + rd * (0xff - a)) >> 8);
-                        gd = (byte)((gs * a + gd * (0xff - a)) >> 8);
-                        bd = (byte)((bs * a + bd * (0xff - a)) >> 8);
+                        rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
+                        gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
+                        bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
 
-                        buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                        buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
                     }
                 }
 
@@ -216,10 +216,10 @@ namespace System.Windows.Media.Imaging
             float dx = x2 - x1;
             float dy = y2 - y1;
 
-            var xtot = (float)(w * dy / Math.Sqrt(dx * dx + dy * dy));
-            var ytot = (float)(w * dx / Math.Sqrt(dx * dx + dy * dy));
+            var xtot = (float)(w * dy / Math.Sqrt((dx * dx) + (dy * dy)));
+            var ytot = (float)(w * dx / Math.Sqrt((dx * dx) + (dy * dy)));
 
-            float sm = dx * dy / (dx * dx + dy * dy);
+            float sm = dx * dy / ((dx * dx) + (dy * dy));
 
             // Center it.
 
@@ -293,7 +293,7 @@ namespace System.Windows.Media.Imaging
             for (int y = starty + 1; y < endy - 1; y++)
             {
                 leftEdgeX[y] = -1 << 16;
-                rightEdgeX[y] = 1 << 16 - 1;
+                rightEdgeX[y] = 1 << (16 - 1);
             }
 
 
@@ -354,17 +354,17 @@ namespace System.Windows.Media.Imaging
                     gs = g;
                     bs = b;
 
-                    d = buffer[y * width + x];
+                    d = buffer[(y * width) + x];
 
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)((rs * a + rd * (0xff - a)) >> 8);
-                    gd = (byte)((gs * a + gd * (0xff - a)) >> 8);
-                    bd = (byte)((bs * a + bd * (0xff - a)) >> 8);
+                    rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
+                    gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
+                    bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
 
-                    buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
                 }
             }
         }
@@ -403,12 +403,12 @@ namespace System.Windows.Media.Imaging
                 Swap(ref y1, ref y2);
             }
 
-            int deltax = (x2 - x1);
-            int deltay = (y2 - y1);
+            int deltax = x2 - x1;
+            int deltay = y2 - y1;
 
             if (x1 > x2)
             {
-                deltax = (x1 - x2);
+                deltax = x1 - x2;
             }
 
             int x = x1;
@@ -418,11 +418,11 @@ namespace System.Windows.Media.Imaging
 
             if (deltax > deltay)
             {
-                m = (ushort)(((deltay << 16) / deltax));
+                m = (ushort)((deltay << 16) / deltax);
             }
             else
             {
-                m = (ushort)(((deltax << 16) / deltay));
+                m = (ushort)((deltax << 16) / deltay);
             }
 
             UInt16 e = 0;
@@ -482,23 +482,23 @@ namespace System.Windows.Media.Imaging
 
                     //
 
-                    ta = (byte)((a * (UInt16)(((((UInt16)(e >> 8))) ^ off))) >> 8);
+                    ta = (byte)((a * (UInt16)(((UInt16)(e >> 8)) ^ off)) >> 8);
 
                     rs = r;
                     gs = g;
                     bs = b;
 
-                    d = buffer[y * width + x];
+                    d = buffer[(y * width) + x];
 
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)((rs * ta + rd * (0xff - ta)) >> 8);
-                    gd = (byte)((gs * ta + gd * (0xff - ta)) >> 8);
-                    bd = (byte)((bs * ta + bd * (0xff - ta)) >> 8);
+                    rd = (byte)(((rs * ta) + (rd * (0xff - ta))) >> 8);
+                    gd = (byte)(((gs * ta) + (gd * (0xff - ta))) >> 8);
+                    bd = (byte)(((bs * ta) + (bd * (0xff - ta))) >> 8);
 
-                    buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
 
                     //
                 }
@@ -537,23 +537,23 @@ namespace System.Windows.Media.Imaging
 
                     //
 
-                    ta = (byte)((a * (UInt16)(((((UInt16)(e >> 8))) ^ off))) >> 8);
+                    ta = (byte)((a * (UInt16)(((UInt16)(e >> 8)) ^ off)) >> 8);
 
                     rs = r;
                     gs = g;
                     bs = b;
 
-                    d = buffer[y * width + x];
+                    d = buffer[(y * width) + x];
 
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)((rs * ta + rd * (0xff - ta)) >> 8);
-                    gd = (byte)((gs * ta + gd * (0xff - ta)) >> 8);
-                    bd = (byte)((bs * ta + bd * (0xff - ta)) >> 8);
+                    rd = (byte)(((rs * ta) + (rd * (0xff - ta))) >> 8);
+                    gd = (byte)(((gs * ta) + (gd * (0xff - ta))) >> 8);
+                    bd = (byte)(((bs * ta) + (bd * (0xff - ta))) >> 8);
 
-                    buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
 
                     if (leftEdge)
                     {

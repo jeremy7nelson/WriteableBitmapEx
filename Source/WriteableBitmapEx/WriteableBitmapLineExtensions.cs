@@ -126,7 +126,7 @@ namespace System.Windows.Media.Imaging
                 int error = el >> 1;
                 if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
                 {
-                    pixels[y * w + x] = color;
+                    pixels[(y * w) + x] = color;
                 }
 
                 // Walk the line!
@@ -151,7 +151,7 @@ namespace System.Windows.Media.Imaging
                     // Set pixel
                     if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
                     {
-                        pixels[y * w + x] = color;
+                        pixels[(y * w) + x] = color;
                     }
                 }
             }
@@ -232,7 +232,7 @@ namespace System.Windows.Media.Imaging
                     {
                         if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
                         {
-                            pixels[(int)y * w + (int)x] = color;
+                            pixels[((int)y * w) + (int)x] = color;
                         }
                         x += incx;
                         y += incy;
@@ -380,8 +380,8 @@ namespace System.Windows.Media.Imaging
                         {
                             // Find highest y2s that is less or equal than ws - 1.
                             // y2s = y1s + n * incy. Find n.
-                            y2s = hs - 1 - (hs - 1 - y1s) % incy;
-                            x2 = x1 + (y2s - y1s) / incy;
+                            y2s = hs - 1 - ((hs - 1 - y1s) % incy);
+                            x2 = x1 + ((y2s - y1s) / incy);
                         }
                     }
                 }
@@ -400,7 +400,7 @@ namespace System.Windows.Media.Imaging
                         int oldy1s = y1s;
                         // Find highest y1s that is less or equal than ws - 1.
                         // y1s = oldy1s + n * incy. Find n.
-                        y1s = hs - 1 + (incy - (hs - 1 - oldy1s) % incy);
+                        y1s = hs - 1 + (incy - ((hs - 1 - oldy1s) % incy));
                         x1 += (y1s - oldy1s) / incy;
                     }
                     if (y2s < 0)
@@ -410,7 +410,7 @@ namespace System.Windows.Media.Imaging
                             // Find lowest y2s that is greater or equal than 0.
                             // y2s = y1s + n * incy. Find n.
                             y2s = y1s % incy;
-                            x2 = x1 + (y2s - y1s) / incy;
+                            x2 = x1 + ((y2s - y1s) / incy);
                         }
                     }
                 }
@@ -430,7 +430,7 @@ namespace System.Windows.Media.Imaging
                 // Walk the line!
                 int y = ys >> PRECISION_SHIFT;
                 int previousY = y;
-                int index = x1 + y * pixelWidth;
+                int index = x1 + (y * pixelWidth);
                 int k = incy < 0 ? 1 - pixelWidth : 1 + pixelWidth;
                 for (int x = x1; x <= x2; ++x)
                 {
@@ -495,8 +495,8 @@ namespace System.Windows.Media.Imaging
                         {
                             // Find highest x2s that is less or equal than ws - 1.
                             // x2s = x1s + n * incx. Find n.
-                            x2s = ws - 1 - (ws - 1 - x1s) % incx;
-                            y2 = y1 + (x2s - x1s) / incx;
+                            x2s = ws - 1 - ((ws - 1 - x1s) % incx);
+                            y2 = y1 + ((x2s - x1s) / incx);
                         }
                     }
                 }
@@ -515,7 +515,7 @@ namespace System.Windows.Media.Imaging
                         int oldx1s = x1s;
                         // Find highest x1s that is less or equal than ws - 1.
                         // x1s = oldx1s + n * incx. Find n.
-                        x1s = ws - 1 + (incx - (ws - 1 - oldx1s) % incx);
+                        x1s = ws - 1 + (incx - ((ws - 1 - oldx1s) % incx));
                         y1 += (x1s - oldx1s) / incx;
                     }
                     if (x2s < 0)
@@ -525,7 +525,7 @@ namespace System.Windows.Media.Imaging
                             // Find lowest x2s that is greater or equal than 0.
                             // x2s = x1s + n * incx. Find n.
                             x2s = x1s % incx;
-                            y2 = y1 + (x2s - x1s) / incx;
+                            y2 = y1 + ((x2s - x1s) / incx);
                         }
                     }
                 }
@@ -834,7 +834,7 @@ namespace System.Windows.Media.Imaging
                 if (on) {
                     //bmp.SetPixel(x, i, color);
                     //var idx = GetIndex(x, i, width);
-                    var idx = (i - 1) * width + x;
+                    var idx = ((i - 1) * width) + x;
                     pixels[idx] = color;
                     on = i % dotLength != 0;
                     spaceCnt = 0;
@@ -871,7 +871,7 @@ namespace System.Windows.Media.Imaging
                 if (on) {
                     //bmp.SetPixel(i, y, color);
                     //var idx = GetIndex(i, y, width);
-                    var idx = y * width + i - 1;
+                    var idx = (y * width) + i - 1;
                     pixels[idx] = color;
                     on = i % dotLength != 0;
                     spaceCnt = 0;
@@ -896,7 +896,7 @@ namespace System.Windows.Media.Imaging
             }
             Swap(ref x1, ref x2, ref y1, ref y2);
             float m = (y2 - y1) / (float)(x2 - x1);
-            float n = y1 - m * x1;
+            float n = y1 - (m * x1);
             var pixels = context.Pixels;
 
             bool on = true;
@@ -905,7 +905,7 @@ namespace System.Windows.Media.Imaging
                 if (i == 0) {
                     continue;
                 }
-                int y = (int)(m * i + n);
+                int y = (int)((m * i) + n);
                 if (y <= 0) {
                     continue;
                 }
@@ -915,7 +915,7 @@ namespace System.Windows.Media.Imaging
                 if (on) {
                     //bmp.SetPixel(i, y, color);
                     //var idx = GetIndex(i, y, width);
-                    var idx = (y - 1) * width + i - 1;
+                    var idx = ((y - 1) * width) + i - 1;
                     pixels[idx] = color;
                     spaceCnt = 0;
                     on = i % dotLength != 0;
@@ -1025,7 +1025,7 @@ namespace System.Windows.Media.Imaging
             }
 
             // draw initial pixel, which is always intersected by line to it's at 100% intensity
-            pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, sr, sg, sb, pixels[y1 * pixelWidth + x1]);
+            pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, sr, sg, sb, pixels[(y1 * pixelWidth) + x1]);
             //bitmap.SetPixel(X0, Y0, BaseColor);
 
             DeltaX = (short)(x2 - x1);
@@ -1048,7 +1048,7 @@ namespace System.Windows.Media.Imaging
                 while (DeltaX-- != 0)
                 {
                     x1 += XDir;
-                    pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, sr, sg, sb, pixels[y1 * pixelWidth + x1]);
+                    pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, sr, sg, sb, pixels[(y1 * pixelWidth) + x1]);
                 }
                 return;
             }
@@ -1058,7 +1058,7 @@ namespace System.Windows.Media.Imaging
                 do
                 {
                     y1++;
-                    pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, sr, sg, sb, pixels[y1 * pixelWidth + x1]);
+                    pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, sr, sg, sb, pixels[(y1 * pixelWidth) + x1]);
                 } while (--DeltaY != 0);
                 return;
             }
@@ -1069,7 +1069,7 @@ namespace System.Windows.Media.Imaging
                 {
                     x1 += XDir;
                     y1++;
-                    pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, sr, sg, sb, pixels[y1 * pixelWidth + x1]);
+                    pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, sr, sg, sb, pixels[(y1 * pixelWidth) + x1]);
                 } while (--DeltaY != 0);
                 return;
             }
@@ -1102,17 +1102,17 @@ namespace System.Windows.Media.Imaging
                     Weighting = (ushort)(ErrorAcc >> INTENSITY_SHIFT);
 
                     int weight = Weighting ^ WEIGHT_COMPLEMENT_MASK;
-                    pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[y1 * pixelWidth + x1]);
+                    pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[(y1 * pixelWidth) + x1]);
 
                     weight = Weighting;
-                    pixels[y1 * pixelWidth + x1 + XDir] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[y1 * pixelWidth + x1 + XDir]);
+                    pixels[(y1 * pixelWidth) + x1 + XDir] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[(y1 * pixelWidth) + x1 + XDir]);
 
                     //bitmap.SetPixel(X0, Y0, 255 - (BaseColor + Weighting));
                     //bitmap.SetPixel(X0 + XDir, Y0, 255 - (BaseColor + (Weighting ^ WeightingComplementMask)));
                 }
 
                 // Draw the final pixel, which is always exactly intersected by the line and so needs no weighting
-                pixels[y2 * pixelWidth + x2] = AlphaBlend(sa, sr, sg, sb, pixels[y2 * pixelWidth + x2]);
+                pixels[(y2 * pixelWidth) + x2] = AlphaBlend(sa, sr, sg, sb, pixels[(y2 * pixelWidth) + x2]);
                 //bitmap.SetPixel(X1, Y1, BaseColor);
                 return;
             }
@@ -1138,17 +1138,17 @@ namespace System.Windows.Media.Imaging
                 Weighting = (ushort)(ErrorAcc >> INTENSITY_SHIFT);
 
                 int weight = Weighting ^ WEIGHT_COMPLEMENT_MASK;
-                pixels[y1 * pixelWidth + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[y1 * pixelWidth + x1]);
+                pixels[(y1 * pixelWidth) + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[(y1 * pixelWidth) + x1]);
 
                 weight = Weighting;
-                pixels[(y1 + 1) * pixelWidth + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[(y1 + 1) * pixelWidth + x1]);
+                pixels[((y1 + 1) * pixelWidth) + x1] = AlphaBlend(sa, (sr * weight) >> 8, (sg * weight) >> 8, (sb * weight) >> 8, pixels[((y1 + 1) * pixelWidth) + x1]);
 
                 //bitmap.SetPixel(X0, Y0, 255 - (BaseColor + Weighting));
                 //bitmap.SetPixel(X0, Y0 + 1,
                 //      255 - (BaseColor + (Weighting ^ WeightingComplementMask)));
             }
             // Draw the final pixel, which is always exactly intersected by the line and thus needs no weighting 
-            pixels[y2 * pixelWidth + x2] = AlphaBlend(sa, sr, sg, sb, pixels[y2 * pixelWidth + x2]);
+            pixels[(y2 * pixelWidth) + x2] = AlphaBlend(sa, sr, sg, sb, pixels[(y2 * pixelWidth) + x2]);
             //bitmap.SetPixel(X1, Y1, BaseColor);
         }
 
@@ -1330,7 +1330,7 @@ namespace System.Windows.Media.Imaging
                 y2 = pixelHeight - 2;
             }
 
-            var addr = y1 * pixelWidth + x1;
+            var addr = (y1 * pixelWidth) + x1;
             var dx = x2 - x1;
             var dy = y2 - y1;
 
@@ -1396,24 +1396,24 @@ namespace System.Windows.Media.Imaging
             }
 
             var uend = u + du;
-            var d = (dv << 1) - du;        // Initial value as in Bresenham's 
-            var incrS = dv << 1;    // &#916;d for straight increments 
+            var d = (dv << 1) - du;        // Initial value as in Bresenham's
+            var incrS = dv << 1;    // &#916;d for straight increments
             var incrD = (dv - du) << 1;    // &#916;d for diagonal increments
 
-            var invDFloat = 1.0 / (4.0 * Math.Sqrt(du * du + dv * dv));   // Precomputed inverse denominator 
-            var invD2DuFloat = 0.75 - 2.0 * (du * invDFloat);   // Precomputed constant
+            var invDFloat = 1.0 / (4.0 * Math.Sqrt((du * du) + (dv * dv)));   // Precomputed inverse denominator
+            var invD2DuFloat = 0.75 - (2.0 * (du * invDFloat));   // Precomputed constant
 
-            const int PRECISION_SHIFT = 10; // result distance should be from 0 to 1 << PRECISION_SHIFT, mapping to a range of 0..1 
+            const int PRECISION_SHIFT = 10; // result distance should be from 0 to 1 << PRECISION_SHIFT, mapping to a range of 0..1
             const int PRECISION_MULTIPLIER = 1 << PRECISION_SHIFT;
             var invD = (int)(invDFloat * PRECISION_MULTIPLIER);
             var invD2Du = (int)(invD2DuFloat * PRECISION_MULTIPLIER * a);
             var zeroDot75 = (int)(0.75 * PRECISION_MULTIPLIER * a);
 
             var invDMulAlpha = invD * a;
-            var duMulInvD = du * invDMulAlpha; // used to help optimize twovdu * invD 
-            var dMulInvD = d * invDMulAlpha; // used to help optimize twovdu * invD 
-            //int twovdu = 0;    // Numerator of distance; starts at 0 
-            var twovduMulInvD = 0; // since twovdu == 0 
+            var duMulInvD = du * invDMulAlpha; // used to help optimize twovdu * invD
+            var dMulInvD = d * invDMulAlpha; // used to help optimize twovdu * invD
+            //int twovdu = 0;    // Numerator of distance; starts at 0
+            var twovduMulInvD = 0; // since twovdu == 0
             var incrSMulInvD = incrS * invDMulAlpha;
             var incrDMulInvD = incrD * invDMulAlpha;
 
@@ -1445,27 +1445,27 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary> 
-        /// Blends a specific source color on top of a destination premultiplied color 
+        /// Blends a specific source color on top of a destination premultiplied color
         /// </summary> 
-        /// <param name="context">Array containing destination color</param> 
-        /// <param name="index">Index of destination pixel</param> 
-        /// <param name="sa">Source alpha (0..255)</param> 
-        /// <param name="srb">Source non-premultiplied red and blue component in the format 0x00rr00bb</param> 
-        /// <param name="sg">Source green component (0..255)</param> 
+        /// <param name="context">Array containing destination color</param>
+        /// <param name="index">Index of destination pixel</param>
+        /// <param name="sa">Source alpha (0..255)</param>
+        /// <param name="srb">Source non-premultiplied red and blue component in the format 0x00rr00bb</param>
+        /// <param name="sg">Source green component (0..255)</param>
         private static void AlphaBlendNormalOnPremultiplied(BitmapContext context, int index, int sa, uint srb, uint sg)
         {
             var pixels = context.Pixels;
             var destPixel = (uint)pixels[index];
 
-            var da = (destPixel >> 24);
-            var dg = ((destPixel >> 8) & 0xff);
+            var da = destPixel >> 24;
+            var dg = (destPixel >> 8) & 0xff;
             var drb = destPixel & 0x00FF00FF;
 
-            // blend with high-quality alpha and lower quality but faster 1-off RGBs 
+            // blend with high-quality alpha and lower quality but faster 1-off RGBs
             pixels[index] = (int)(
-               ((sa + ((da * (255 - sa) * 0x8081) >> 23)) << 24) | // alpha 
-               (((sg - dg) * sa + (dg << 8)) & 0xFFFFFF00) | // green 
-               (((((srb - drb) * sa) >> 8) + drb) & 0x00FF00FF) // red and blue 
+               ((sa + ((da * (255 - sa) * 0x8081) >> 23)) << 24) | // alpha
+               ((((sg - dg) * sa) + (dg << 8)) & 0xFFFFFF00) | // green
+               (((((srb - drb) * sa) >> 8) + drb) & 0x00FF00FF) // red and blue
             );
         }
 
@@ -1475,7 +1475,7 @@ namespace System.Windows.Media.Imaging
 
         internal static bool CohenSutherlandLineClipWithViewPortOffset(Rect viewPort, ref float xi0, ref float yi0, ref float xi1, ref float yi1, int offset)
         {
-            var viewPortWithOffset = new Rect(viewPort.X - offset, viewPort.Y - offset, viewPort.Width + 2 * offset, viewPort.Height + 2 * offset);
+            var viewPortWithOffset = new Rect(viewPort.X - offset, viewPort.Y - offset, viewPort.Width + (2 * offset), viewPort.Height + (2 * offset));
 
             return CohenSutherlandLineClip(viewPortWithOffset, ref xi0, ref yi0, ref xi1, ref yi1);
         }
@@ -1580,22 +1580,22 @@ namespace System.Windows.Media.Imaging
                     // use formulas y = y0 + slope * (x - x0), x = x0 + (1 / slope) * (y - y0)
                     if ((outcodeOut & TOP) != 0)
                     {   // point is above the clip rectangle
-                        x = x0 + (x1 - x0) * (extents.Top - y0) / (y1 - y0);
+                        x = x0 + ((x1 - x0) * (extents.Top - y0) / (y1 - y0));
                         y = extents.Top;
                     }
                     else if ((outcodeOut & BOTTOM) != 0)
                     { // point is below the clip rectangle
-                        x = x0 + (x1 - x0) * (extents.Bottom - y0) / (y1 - y0);
+                        x = x0 + ((x1 - x0) * (extents.Bottom - y0) / (y1 - y0));
                         y = extents.Bottom;
                     }
                     else if ((outcodeOut & RIGHT) != 0)
                     {  // point is to the right of clip rectangle
-                        y = y0 + (y1 - y0) * (extents.Right - x0) / (x1 - x0);
+                        y = y0 + ((y1 - y0) * (extents.Right - x0) / (x1 - x0));
                         x = extents.Right;
                     }
                     else if ((outcodeOut & LEFT) != 0)
                     {   // point is to the left of clip rectangle
-                        y = y0 + (y1 - y0) * (extents.Left - x0) / (x1 - x0);
+                        y = y0 + ((y1 - y0) * (extents.Left - x0) / (x1 - x0));
                         x = extents.Left;
                     }
                     else
@@ -1637,15 +1637,15 @@ namespace System.Windows.Media.Imaging
         {
             int dr, dg, db;
             int da;
-            da = ((destPixel >> 24) & 0xff);
-            dr = ((destPixel >> 16) & 0xff);
-            dg = ((destPixel >> 8) & 0xff);
-            db = ((destPixel) & 0xff);
+            da = (destPixel >> 24) & 0xff;
+            dr = (destPixel >> 16) & 0xff;
+            dg = (destPixel >> 8) & 0xff;
+            db = (destPixel) & 0xff;
 
-            destPixel = ((sa + (((da * (255 - sa)) * 0x8081) >> 23)) << 24) |
-               ((sr + (((dr * (255 - sa)) * 0x8081) >> 23)) << 16) |
-               ((sg + (((dg * (255 - sa)) * 0x8081) >> 23)) << 8) |
-               ((sb + (((db * (255 - sa)) * 0x8081) >> 23)));
+            destPixel = ((sa + ((da * (255 - sa) * 0x8081) >> 23)) << 24) |
+               ((sr + ((dr * (255 - sa) * 0x8081) >> 23)) << 16) |
+               ((sg + ((dg * (255 - sa) * 0x8081) >> 23)) << 8) |
+               (sb + ((db * (255 - sa) * 0x8081) >> 23));
 
             return destPixel;
         }

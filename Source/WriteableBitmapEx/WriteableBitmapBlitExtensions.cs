@@ -184,7 +184,7 @@ namespace System.Windows.Media.Imaging
                         if (y >= 0 && y < dph)
                         {
                             ii = sourceStartX;
-                            idx = px + y * dpw;
+                            idx = px + (y * dpw);
                             x = px;
                             sourcePixel = sourcePixels[0];
 
@@ -192,7 +192,7 @@ namespace System.Windows.Media.Imaging
                             // even for smaller sprites like the 32x32 particles. 
                             if (blendMode == BlendMode.None && !tinted)
                             {
-                                sourceIdx = (int)ii + (int)jj * sourceWidth;
+                                sourceIdx = (int)ii + ((int)jj * sourceWidth);
                                 var offset = x < 0 ? -x : 0;
                                 var xx = x + offset;
                                 var wx = sourceWidth - offset;
@@ -219,20 +219,20 @@ namespace System.Windows.Media.Imaging
                                     {
                                         if ((int)ii != lastii || (int)jj != lastjj)
                                         {
-                                            sourceIdx = (int)ii + (int)jj * sourceWidth;
+                                            sourceIdx = (int)ii + ((int)jj * sourceWidth);
                                             if (sourceIdx >= 0 && sourceIdx < sourceLength)
                                             {
                                                 sourcePixel = sourcePixels[sourceIdx];
-                                                sa = ((sourcePixel >> 24) & 0xff);
-                                                sr = ((sourcePixel >> 16) & 0xff);
-                                                sg = ((sourcePixel >> 8) & 0xff);
-                                                sb = ((sourcePixel) & 0xff);
+                                                sa = (sourcePixel >> 24) & 0xff;
+                                                sr = (sourcePixel >> 16) & 0xff;
+                                                sg = (sourcePixel >> 8) & 0xff;
+                                                sb = (sourcePixel) & 0xff;
                                                 if (tinted && sa != 0)
                                                 {
-                                                    sa = (((sa * ca) * 0x8081) >> 23);
-                                                    sr = ((((((sr * cr) * 0x8081) >> 23) * ca) * 0x8081) >> 23);
-                                                    sg = ((((((sg * cg) * 0x8081) >> 23) * ca) * 0x8081) >> 23);
-                                                    sb = ((((((sb * cb) * 0x8081) >> 23) * ca) * 0x8081) >> 23);
+                                                    sa = (sa * ca * 0x8081) >> 23;
+                                                    sr = (((sr * cr * 0x8081) >> 23) * ca * 0x8081) >> 23;
+                                                    sg = (((sg * cg * 0x8081) >> 23) * ca * 0x8081) >> 23;
+                                                    sb = (((sb * cb * 0x8081) >> 23) * ca * 0x8081) >> 23;
                                                     sourcePixel = (sa << 24) | (sr << 16) | (sg << 8) | sb;
                                                 }
                                             }
@@ -247,9 +247,9 @@ namespace System.Windows.Media.Imaging
                                         }
                                         else if (blendMode == BlendMode.ColorKeying)
                                         {
-                                            sr = ((sourcePixel >> 16) & 0xff);
-                                            sg = ((sourcePixel >> 8) & 0xff);
-                                            sb = ((sourcePixel) & 0xff);
+                                            sr = (sourcePixel >> 16) & 0xff;
+                                            sg = (sourcePixel >> 8) & 0xff;
+                                            sb = (sourcePixel) & 0xff;
 
                                             if (sr != color.R || sg != color.G || sb != color.B)
                                             {
@@ -259,20 +259,20 @@ namespace System.Windows.Media.Imaging
                                         else if (blendMode == BlendMode.Mask)
                                         {
                                             int destPixel = destPixels[idx];
-                                            da = ((destPixel >> 24) & 0xff);
-                                            dr = ((destPixel >> 16) & 0xff);
-                                            dg = ((destPixel >> 8) & 0xff);
-                                            db = ((destPixel) & 0xff);
-                                            destPixel = ((((da * sa) * 0x8081) >> 23) << 24) |
-                                                        ((((dr * sa) * 0x8081) >> 23) << 16) |
-                                                        ((((dg * sa) * 0x8081) >> 23) << 8) |
-                                                        ((((db * sa) * 0x8081) >> 23));
+                                            da = (destPixel >> 24) & 0xff;
+                                            dr = (destPixel >> 16) & 0xff;
+                                            dg = (destPixel >> 8) & 0xff;
+                                            db = (destPixel) & 0xff;
+                                            destPixel = (((da * sa * 0x8081) >> 23) << 24) |
+                                                        (((dr * sa * 0x8081) >> 23) << 16) |
+                                                        (((dg * sa * 0x8081) >> 23) << 8) |
+                                                        ((db * sa * 0x8081) >> 23);
                                             destPixels[idx] = destPixel;
                                         }
                                         else if (sa > 0)
                                         {
                                             int destPixel = destPixels[idx];
-                                            da = ((destPixel >> 24) & 0xff);
+                                            da = (destPixel >> 24) & 0xff;
                                             if ((sa == 255 || da == 0) &&
                                                            blendMode != BlendMode.Additive
                                                            && blendMode != BlendMode.Subtractive
@@ -283,25 +283,25 @@ namespace System.Windows.Media.Imaging
                                             }
                                             else
                                             {
-                                                dr = ((destPixel >> 16) & 0xff);
-                                                dg = ((destPixel >> 8) & 0xff);
-                                                db = ((destPixel) & 0xff);
+                                                dr = (destPixel >> 16) & 0xff;
+                                                dg = (destPixel >> 8) & 0xff;
+                                                db = (destPixel) & 0xff;
                                                 if (blendMode == BlendMode.Alpha)
                                                 {
                                                     var isa = 255 - sa;
                                                     if (isPrgba)
                                                     {
                                                         destPixel = ((da & 0xff) << 24) |
-                                                                    (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
-                                                                    (((((sg << 8) + isa * dg) >> 8) & 0xff) <<  8) |
-                                                                     ((((sb << 8) + isa * db) >> 8) & 0xff);
+                                                                    (((((sr << 8) + (isa * dr)) >> 8) & 0xff) << 16) |
+                                                                    (((((sg << 8) + (isa * dg)) >> 8) & 0xff) <<  8) |
+                                                                     ((((sb << 8) + (isa * db)) >> 8) & 0xff);
                                                     }
                                                     else
                                                     {
                                                         destPixel = ((da & 0xff) << 24) |
-                                                                    (((((sr * sa) + isa * dr) >> 8) & 0xff) << 16) |
-                                                                    (((((sg * sa) + isa * dg) >> 8) & 0xff) <<  8) |
-                                                                     ((((sb * sa) + isa * db) >> 8) & 0xff);
+                                                                    (((((sr * sa) + (isa * dr)) >> 8) & 0xff) << 16) |
+                                                                    (((((sg * sa) + (isa * dg)) >> 8) & 0xff) <<  8) |
+                                                                     ((((sb * sa) + (isa * db)) >> 8) & 0xff);
                                                     }
                                                 }
                                                 else if (blendMode == BlendMode.Additive)
@@ -310,7 +310,7 @@ namespace System.Windows.Media.Imaging
                                                     destPixel = (a << 24) |
                                                        (((a <= sr + dr) ? a : (sr + dr)) << 16) |
                                                        (((a <= sg + dg) ? a : (sg + dg)) << 8) |
-                                                       (((a <= sb + db) ? a : (sb + db)));
+                                                       ((a <= sb + db) ? a : (sb + db));
                                                 }
                                                 else if (blendMode == BlendMode.Subtractive)
                                                 {
@@ -318,7 +318,7 @@ namespace System.Windows.Media.Imaging
                                                     destPixel = (a << 24) |
                                                        (((sr >= dr) ? 0 : (sr - dr)) << 16) |
                                                        (((sg >= dg) ? 0 : (sg - dg)) << 8) |
-                                                       (((sb >= db) ? 0 : (sb - db)));
+                                                       ((sb >= db) ? 0 : (sb - db));
                                                 }
                                                 else if (blendMode == BlendMode.Multiply)
                                                 {
@@ -336,7 +336,7 @@ namespace System.Windows.Media.Imaging
                                                     destPixel = (ba << 24) |
                                                                 ((ba <= br ? ba : br) << 16) |
                                                                 ((ba <= bg ? ba : bg) << 8) |
-                                                                ((ba <= bb ? ba : bb));
+                                                                (ba <= bb ? ba : bb);
                                                 }
 
                                                 destPixels[idx] = destPixel;
@@ -403,7 +403,7 @@ namespace System.Windows.Media.Imaging
                 if (y >= 0 && y < dph)
                 {
                     ii = sourceStartX;
-                    idx = px + y * dpw;
+                    idx = px + (y * dpw);
                     x = px;
                     sourcePixel = sourcePixels[0];
 
@@ -414,14 +414,14 @@ namespace System.Windows.Media.Imaging
                         {
                             if ((int)ii != lastii || (int)jj != lastjj)
                             {
-                                sourceIdx = (int)ii + (int)jj * sourceWidth;
+                                sourceIdx = (int)ii + ((int)jj * sourceWidth);
                                 if (sourceIdx >= 0 && sourceIdx < sourceLength)
                                 {
                                     sourcePixel = sourcePixels[sourceIdx];
-                                    sa = ((sourcePixel >> 24) & 0xff);
-                                    sr = ((sourcePixel >> 16) & 0xff);
-                                    sg = ((sourcePixel >> 8) & 0xff);
-                                    sb = ((sourcePixel) & 0xff);
+                                    sa = (sourcePixel >> 24) & 0xff;
+                                    sr = (sourcePixel >> 16) & 0xff;
+                                    sg = (sourcePixel >> 8) & 0xff;
+                                    sb = (sourcePixel) & 0xff;
                                 }
                                 else
                                 {
@@ -432,30 +432,30 @@ namespace System.Windows.Media.Imaging
                             if (sa > 0)
                             {
                                 int destPixel = destPixels[idx];
-                                da = ((destPixel >> 24) & 0xff);
-                                if ((sa == 255 || da == 0))
+                                da = (destPixel >> 24) & 0xff;
+                                if (sa == 255 || da == 0)
                                 {
                                     destPixels[idx] = sourcePixel;
                                 }
                                 else
                                 {
-                                    dr = ((destPixel >> 16) & 0xff);
-                                    dg = ((destPixel >> 8) & 0xff);
-                                    db = ((destPixel) & 0xff);
+                                    dr = (destPixel >> 16) & 0xff;
+                                    dg = (destPixel >> 8) & 0xff;
+                                    db = (destPixel) & 0xff;
                                     var isa = 255 - sa;
                                     if (isPrgba)
                                     {
                                         destPixel = ((da & 0xff) << 24) |
-                                                    (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
-                                                    (((((sg << 8) + isa * dg) >> 8) & 0xff) << 8) |
-                                                     ((((sb << 8) + isa * db) >> 8) & 0xff);
+                                                    (((((sr << 8) + (isa * dr)) >> 8) & 0xff) << 16) |
+                                                    (((((sg << 8) + (isa * dg)) >> 8) & 0xff) << 8) |
+                                                     ((((sb << 8) + (isa * db)) >> 8) & 0xff);
                                     }
                                     else
                                     {
                                         destPixel = ((da & 0xff) << 24) |
-                                                    (((((sr * sa) + isa * dr) >> 8) & 0xff) << 16) |
-                                                    (((((sg * sa) + isa * dg) >> 8) & 0xff) << 8) |
-                                                     ((((sb * sa) + isa * db) >> 8) & 0xff);
+                                                    (((((sr * sa) + (isa * dr)) >> 8) & 0xff) << 16) |
+                                                    (((((sg * sa) + (isa * dg)) >> 8) & 0xff) << 8) |
+                                                     ((((sb * sa) + (isa * db)) >> 8) & 0xff);
                                     }
                                     destPixels[idx] = destPixel;
                                 }
@@ -485,7 +485,7 @@ namespace System.Windows.Media.Imaging
         public static void BlitRender(this WriteableBitmap bmp, WriteableBitmap source, bool shouldClear = true, float opacity = 1f, GeneralTransform transform = null)
         {
             const int PRECISION_SHIFT = 10;
-            const int PRECISION_VALUE = (1 << PRECISION_SHIFT);
+            const int PRECISION_VALUE = 1 << PRECISION_SHIFT;
             const int PRECISION_MASK = PRECISION_VALUE - 1;
 
             using (BitmapContext destContext = bmp.GetBitmapContext())
@@ -524,8 +524,8 @@ namespace System.Windows.Media.Imaging
                     Point oneZero = inverse.Transform(new Point(startX + 1, startY));
                     Point zeroOne = inverse.Transform(new Point(startX, startY + 1));
 
-                    float sourceXf = ((float)zeroZero.X);
-                    float sourceYf = ((float)zeroZero.Y);
+                    float sourceXf = (float)zeroZero.X;
+                    float sourceYf = (float)zeroZero.Y;
                     int dxDx = (int)((((float)oneZero.X) - sourceXf) * PRECISION_VALUE); // for 1 unit in X coord, how much does X change in source texture?
                     int dxDy = (int)((((float)oneZero.Y) - sourceYf) * PRECISION_VALUE); // for 1 unit in X coord, how much does Y change in source texture?
                     int dyDx = (int)((((float)zeroOne.X) - sourceXf) * PRECISION_VALUE); // for 1 unit in Y coord, how much does X change in source texture?
@@ -541,7 +541,7 @@ namespace System.Windows.Media.Imaging
                     int index = 0;
                     for (int destY = startY; destY < endY; destY++)
                     {
-                        index = destY * destWidth + startX;
+                        index = (destY * destWidth) + startX;
                         int savedSourceX = sourceX;
                         int savedSourceY = sourceY;
 
@@ -586,7 +586,7 @@ namespace System.Windows.Media.Imaging
                                     yCeil = sourceWidth;
                                 }
 
-                                int i1 = yFloor * sourceWidth + xFloor;
+                                int i1 = (yFloor * sourceWidth) + xFloor;
                                 int p1 = sourcePixels[i1];
                                 int p2 = sourcePixels[i1 + xCeil];
                                 int p3 = sourcePixels[i1 + yCeil];

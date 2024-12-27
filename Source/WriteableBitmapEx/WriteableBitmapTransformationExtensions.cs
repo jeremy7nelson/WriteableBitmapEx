@@ -118,7 +118,7 @@ namespace System.Windows.Media.Imaging
                 {
                     for (var line = 0; line < height; line++)
                     {
-                        var srcOff = ((y + line) * srcWidth + x) * SizeOfArgb;
+                        var srcOff = (((y + line) * srcWidth) + x) * SizeOfArgb;
                         var dstOff = line * width * SizeOfArgb;
                         BitmapContext.BlockCopy(srcContext, srcOff, destContext, dstOff, width * SizeOfArgb);
                     }
@@ -214,7 +214,7 @@ namespace System.Windows.Media.Imaging
                         x0 = (int)sx;
                         y0 = (int)sy;
 
-                        pd[srcIdx++] = pixels[y0 * widthSource + x0];
+                        pd[srcIdx++] = pixels[(y0 * widthSource) + x0];
                     }
                 }
             }
@@ -250,51 +250,51 @@ namespace System.Windows.Media.Imaging
 
 
                         // Read source color
-                        c = pixels[y0 * widthSource + x0];
+                        c = pixels[(y0 * widthSource) + x0];
                         c1a = (byte)(c >> 24);
                         c1r = (byte)(c >> 16);
                         c1g = (byte)(c >> 8);
-                        c1b = (byte)(c);
+                        c1b = (byte)c;
 
-                        c = pixels[y0 * widthSource + x1];
+                        c = pixels[(y0 * widthSource) + x1];
                         c2a = (byte)(c >> 24);
                         c2r = (byte)(c >> 16);
                         c2g = (byte)(c >> 8);
-                        c2b = (byte)(c);
+                        c2b = (byte)c;
 
-                        c = pixels[y1 * widthSource + x0];
+                        c = pixels[(y1 * widthSource) + x0];
                         c3a = (byte)(c >> 24);
                         c3r = (byte)(c >> 16);
                         c3g = (byte)(c >> 8);
-                        c3b = (byte)(c);
+                        c3b = (byte)c;
 
-                        c = pixels[y1 * widthSource + x1];
+                        c = pixels[(y1 * widthSource) + x1];
                         c4a = (byte)(c >> 24);
                         c4r = (byte)(c >> 16);
                         c4g = (byte)(c >> 8);
-                        c4b = (byte)(c);
+                        c4b = (byte)c;
 
 
                         // Calculate colors
                         // Alpha
-                        l0 = ifracx * c1a + fracx * c2a;
-                        l1 = ifracx * c3a + fracx * c4a;
-                        a = (byte)(ifracy * l0 + fracy * l1);
+                        l0 = (ifracx * c1a) + (fracx * c2a);
+                        l1 = (ifracx * c3a) + (fracx * c4a);
+                        a = (byte)((ifracy * l0) + (fracy * l1));
 
                         // Red
-                        l0 = ifracx * c1r + fracx * c2r;
-                        l1 = ifracx * c3r + fracx * c4r;
-                        rf = ifracy * l0 + fracy * l1;
+                        l0 = (ifracx * c1r) + (fracx * c2r);
+                        l1 = (ifracx * c3r) + (fracx * c4r);
+                        rf = (ifracy * l0) + (fracy * l1);
 
                         // Green
-                        l0 = ifracx * c1g + fracx * c2g;
-                        l1 = ifracx * c3g + fracx * c4g;
-                        gf = ifracy * l0 + fracy * l1;
+                        l0 = (ifracx * c1g) + (fracx * c2g);
+                        l1 = (ifracx * c3g) + (fracx * c4g);
+                        gf = (ifracy * l0) + (fracy * l1);
 
                         // Blue
-                        l0 = ifracx * c1b + fracx * c2b;
-                        l1 = ifracx * c3b + fracx * c4b;
-                        bf = ifracy * l0 + fracy * l1;
+                        l0 = (ifracx * c1b) + (fracx * c2b);
+                        l1 = (ifracx * c3b) + (fracx * c4b);
+                        bf = (ifracy * l0) + (fracy * l1);
 
                         // Cast to byte
                         r = (byte)rf;
@@ -341,7 +341,7 @@ namespace System.Windows.Media.Imaging
                         {
                             for (var y = h - 1; y >= 0; y--)
                             {
-                                var srcInd = y * w + x;
+                                var srcInd = (y * w) + x;
                                 rp[i] = p[srcInd];
                                 i++;
                             }
@@ -358,7 +358,7 @@ namespace System.Windows.Media.Imaging
                         {
                             for (var x = w - 1; x >= 0; x--)
                             {
-                                var srcInd = y * w + x;
+                                var srcInd = (y * w) + x;
                                 rp[i] = p[srcInd];
                                 i++;
                             }
@@ -375,7 +375,7 @@ namespace System.Windows.Media.Imaging
                         {
                             for (var y = 0; y < h; y++)
                             {
-                                var srcInd = y * w + x;
+                                var srcInd = (y * w) + x;
                                 rp[i] = p[srcInd];
                                 i++;
                             }
@@ -468,13 +468,13 @@ namespace System.Windows.Media.Imaging
                             y = iDestCentreY - i;
 
                             // convert Cartesian to polar
-                            fDistance = Math.Sqrt(x * x + y * y);
+                            fDistance = Math.Sqrt((x * x) + (y * y));
                             if (x == 0)
                             {
                                 if (y == 0)
                                 {
                                     // center of image, no rotation needed
-                                    newp[i * newWidth + j] = oldp[iCentreY * oldw + iCentreX];
+                                    newp[(i * newWidth) + j] = oldp[(iCentreY * oldw) + iCentreX];
                                     continue;
                                 }
                                 if (y < 0)
@@ -503,10 +503,10 @@ namespace System.Windows.Media.Imaging
                             fTrueX = fTrueX + iCentreX;
                             fTrueY = iCentreY - fTrueY;
 
-                            iFloorX = (int)(Math.Floor(fTrueX));
-                            iFloorY = (int)(Math.Floor(fTrueY));
-                            iCeilingX = (int)(Math.Ceiling(fTrueX));
-                            iCeilingY = (int)(Math.Ceiling(fTrueY));
+                            iFloorX = (int)Math.Floor(fTrueX);
+                            iFloorY = (int)Math.Floor(fTrueY);
+                            iCeilingX = (int)Math.Ceiling(fTrueX);
+                            iCeilingY = (int)Math.Ceiling(fTrueY);
 
                             // check bounds
                             if (iFloorX < 0 || iCeilingX < 0 || iFloorX >= iWidth || iCeilingX >= iWidth || iFloorY < 0 ||
@@ -518,27 +518,27 @@ namespace System.Windows.Media.Imaging
                             fDeltaX = fTrueX - iFloorX;
                             fDeltaY = fTrueY - iFloorY;
 
-                            var clrTopLeft = oldp[iFloorY * oldw + iFloorX];
-                            var clrTopRight = oldp[iFloorY * oldw + iCeilingX];
-                            var clrBottomLeft = oldp[iCeilingY * oldw + iFloorX];
-                            var clrBottomRight = oldp[iCeilingY * oldw + iCeilingX];
+                            var clrTopLeft = oldp[(iFloorY * oldw) + iFloorX];
+                            var clrTopRight = oldp[(iFloorY * oldw) + iCeilingX];
+                            var clrBottomLeft = oldp[(iCeilingY * oldw) + iFloorX];
+                            var clrBottomRight = oldp[(iCeilingY * oldw) + iCeilingX];
 
-                            fTopAlpha = (1 - fDeltaX) * ((clrTopLeft >> 24) & 0xFF) + fDeltaX * ((clrTopRight >> 24) & 0xFF);
-                            fTopRed = (1 - fDeltaX) * ((clrTopLeft >> 16) & 0xFF) + fDeltaX * ((clrTopRight >> 16) & 0xFF);
-                            fTopGreen = (1 - fDeltaX) * ((clrTopLeft >> 8) & 0xFF) + fDeltaX * ((clrTopRight >> 8) & 0xFF);
-                            fTopBlue = (1 - fDeltaX) * (clrTopLeft & 0xFF) + fDeltaX * (clrTopRight & 0xFF);
+                            fTopAlpha = ((1 - fDeltaX) * ((clrTopLeft >> 24) & 0xFF)) + (fDeltaX * ((clrTopRight >> 24) & 0xFF));
+                            fTopRed = ((1 - fDeltaX) * ((clrTopLeft >> 16) & 0xFF)) + (fDeltaX * ((clrTopRight >> 16) & 0xFF));
+                            fTopGreen = ((1 - fDeltaX) * ((clrTopLeft >> 8) & 0xFF)) + (fDeltaX * ((clrTopRight >> 8) & 0xFF));
+                            fTopBlue = ((1 - fDeltaX) * (clrTopLeft & 0xFF)) + (fDeltaX * (clrTopRight & 0xFF));
 
                             // linearly interpolate horizontally between bottom neighbors
-                            fBottomAlpha = (1 - fDeltaX) * ((clrBottomLeft >> 24) & 0xFF) + fDeltaX * ((clrBottomRight >> 24) & 0xFF);
-                            fBottomRed = (1 - fDeltaX) * ((clrBottomLeft >> 16) & 0xFF) + fDeltaX * ((clrBottomRight >> 16) & 0xFF);
-                            fBottomGreen = (1 - fDeltaX) * ((clrBottomLeft >> 8) & 0xFF) + fDeltaX * ((clrBottomRight >> 8) & 0xFF);
-                            fBottomBlue = (1 - fDeltaX) * (clrBottomLeft & 0xFF) + fDeltaX * (clrBottomRight & 0xFF);
+                            fBottomAlpha = ((1 - fDeltaX) * ((clrBottomLeft >> 24) & 0xFF)) + (fDeltaX * ((clrBottomRight >> 24) & 0xFF));
+                            fBottomRed = ((1 - fDeltaX) * ((clrBottomLeft >> 16) & 0xFF)) + (fDeltaX * ((clrBottomRight >> 16) & 0xFF));
+                            fBottomGreen = ((1 - fDeltaX) * ((clrBottomLeft >> 8) & 0xFF)) + (fDeltaX * ((clrBottomRight >> 8) & 0xFF));
+                            fBottomBlue = ((1 - fDeltaX) * (clrBottomLeft & 0xFF)) + (fDeltaX * (clrBottomRight & 0xFF));
 
                             // linearly interpolate vertically between top and bottom interpolated results
-                            iRed = (int)(Math.Round((1 - fDeltaY) * fTopRed + fDeltaY * fBottomRed));
-                            iGreen = (int)(Math.Round((1 - fDeltaY) * fTopGreen + fDeltaY * fBottomGreen));
-                            iBlue = (int)(Math.Round((1 - fDeltaY) * fTopBlue + fDeltaY * fBottomBlue));
-                            iAlpha = (int)(Math.Round((1 - fDeltaY) * fTopAlpha + fDeltaY * fBottomAlpha));
+                            iRed = (int)Math.Round(((1 - fDeltaY) * fTopRed) + (fDeltaY * fBottomRed));
+                            iGreen = (int)Math.Round(((1 - fDeltaY) * fTopGreen) + (fDeltaY * fBottomGreen));
+                            iBlue = (int)Math.Round(((1 - fDeltaY) * fTopBlue) + (fDeltaY * fBottomBlue));
+                            iAlpha = (int)Math.Round(((1 - fDeltaY) * fTopAlpha) + (fDeltaY * fBottomAlpha));
 
                             // make sure color values are valid
                             if (iRed < 0)
@@ -582,7 +582,7 @@ namespace System.Windows.Media.Imaging
                             }
 
                             var a = iAlpha + 1;
-                            newp[i * newWidth + j] = (iAlpha << 24)
+                            newp[(i * newWidth) + j] = (iAlpha << 24)
                                                    | ((byte)((iRed * a) >> 8) << 16)
                                                    | ((byte)((iGreen * a) >> 8) << 8)
                                                    | ((byte)((iBlue * a) >> 8));
@@ -624,7 +624,7 @@ namespace System.Windows.Media.Imaging
                         {
                             for (var x = 0; x < w; x++)
                             {
-                                var srcInd = y * w + x;
+                                var srcInd = (y * w) + x;
                                 rp[i] = p[srcInd];
                                 i++;
                             }
@@ -641,7 +641,7 @@ namespace System.Windows.Media.Imaging
                         {
                             for (var x = w - 1; x >= 0; x--)
                             {
-                                var srcInd = y * w + x;
+                                var srcInd = (y * w) + x;
                                 rp[i] = p[srcInd];
                                 i++;
                             }

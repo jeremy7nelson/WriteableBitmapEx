@@ -64,10 +64,10 @@ namespace System.Windows.Media.Imaging
                 var w = context.Width;
                 var h = context.Height;
 
-                int sa = ((color >> 24) & 0xff);
-                int sr = ((color >> 16) & 0xff);
-                int sg = ((color >> 8) & 0xff);
-                int sb = ((color) & 0xff);
+                int sa = (color >> 24) & 0xff;
+                int sr = (color >> 16) & 0xff;
+                int sg = (color >> 8) & 0xff;
+                int sb = (color) & 0xff;
 
                 bool noBlending = !doAlphaBlend || sa == 255;
 
@@ -95,7 +95,7 @@ namespace System.Windows.Media.Imaging
                 {
                     y2 -= y1;
                     y1 += y2;
-                    y2 = (y1 - y2);
+                    y2 = y1 - y2;
                 }
 
                 // Fill first line
@@ -108,9 +108,9 @@ namespace System.Windows.Media.Imaging
                 }
 
                 // Copy first line
-                var len = (x2 - x1);
+                var len = x2 - x1;
                 var srcOffsetBytes = startYPlusX1 * SizeOfArgb;
-                var offset2 = y2 * w + x1;
+                var offset2 = (y2 * w) + x1;
                 for (var y = startYPlusX1 + w; y < offset2; y += w)
                 {
                     if (noBlending)
@@ -133,15 +133,15 @@ namespace System.Windows.Media.Imaging
         {
             // Alpha blend
             int destPixel = pixel;
-            int da = ((destPixel >> 24) & 0xff);
-            int dr = ((destPixel >> 16) & 0xff);
-            int dg = ((destPixel >> 8) & 0xff);
-            int db = ((destPixel) & 0xff);
+            int da = (destPixel >> 24) & 0xff;
+            int dr = (destPixel >> 16) & 0xff;
+            int dg = (destPixel >> 8) & 0xff;
+            int db = (destPixel) & 0xff;
 
-            destPixel = ((sa + (((da * (255 - sa)) * 0x8081) >> 23)) << 24) |
-                                     ((sr + (((dr * (255 - sa)) * 0x8081) >> 23)) << 16) |
-                                     ((sg + (((dg * (255 - sa)) * 0x8081) >> 23)) << 8) |
-                                     ((sb + (((db * (255 - sa)) * 0x8081) >> 23)));
+            destPixel = ((sa + ((da * (255 - sa) * 0x8081) >> 23)) << 24) |
+                                     ((sr + ((dr * (255 - sa) * 0x8081) >> 23)) << 16) |
+                                     ((sg + ((dg * (255 - sa) * 0x8081) >> 23)) << 8) |
+                                     (sb + ((db * (255 - sa) * 0x8081) >> 23));
 
             return destPixel;
         }
@@ -249,10 +249,10 @@ namespace System.Windows.Media.Imaging
                 int xStopping = yrSqTwo * xr;
                 int yStopping = 0;
 
-                int sa = ((color >> 24) & 0xff);
-                int sr = ((color >> 16) & 0xff);
-                int sg = ((color >> 8) & 0xff);
-                int sb = ((color) & 0xff);
+                int sa = (color >> 24) & 0xff;
+                int sr = (color >> 16) & 0xff;
+                int sg = (color >> 8) & 0xff;
+                int sb = (color) & 0xff;
 
                 bool noBlending = !doAlphaBlend || sa == 255;
 
@@ -511,10 +511,10 @@ namespace System.Windows.Media.Imaging
                 int w = context.Width;
                 int h = context.Height;
 
-                int sa = ((color >> 24) & 0xff);
-                int sr = ((color >> 16) & 0xff);
-                int sg = ((color >> 8) & 0xff);
-                int sb = ((color) & 0xff);
+                int sa = (color >> 24) & 0xff;
+                int sr = (color >> 16) & 0xff;
+                int sg = (color >> 8) & 0xff;
+                int sb = (color) & 0xff;
 
                 bool noBlending = !doAlphaBlend || sa == 255;
 
@@ -566,11 +566,11 @@ namespace System.Windows.Media.Imaging
                         float vyj = points[i + 1];
 
                         // Is the scanline between the two points
-                        if (vyi < y && vyj >= y
-                         || vyj < y && vyi >= y)
+                        if ((vyi < y && vyj >= y)
+                         || (vyj < y && vyi >= y))
                         {
                             // Compute the intersection of the scanline with the edge (line between two points)
-                            intersectionsX[intersectionCount++] = (int)(vxi + (y - vyi) / (vyj - vyi) * (vxj - vxi));
+                            intersectionsX[intersectionCount++] = (int)(vxi + ((y - vyi) / (vyj - vyi) * (vxj - vxi)));
                         }
                         vxi = vxj;
                         vyi = vyj;
@@ -613,7 +613,7 @@ namespace System.Windows.Media.Imaging
                             // Fill the pixels
                             for (int x = x0; x <= x1; x++)
                             {
-                                int idx = y * w + x;
+                                int idx = (y * w) + x;
 
                                 pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
                             }
@@ -868,7 +868,7 @@ namespace System.Windows.Media.Imaging
                     foreach (Edge currentEdge in currentEdges)
                     {
                         intersectionsX[intersectionCount++] =
-                            (int)(currentEdge.StartX + (y - currentEdge.StartY) * currentEdge.Sloap);
+                            (int)(currentEdge.StartX + ((y - currentEdge.StartY) * currentEdge.Sloap));
                     }
 
                     // Sort the intersections from left to right using Insertion sort 
@@ -907,7 +907,7 @@ namespace System.Windows.Media.Imaging
                         }
 
                         // Fill the pixels
-                        int index = y * w + x0;
+                        int index = (y * w) + x0;
                         for (int x = x0; x <= x1; x++)
                         {
                             pixels[index++] = color;
@@ -1057,8 +1057,8 @@ namespace System.Windows.Media.Imaging
                     var t1 = 1 - t;
                     var t1Sq = t1 * t1;
 
-                    tx = (int)(t1 * t1Sq * x1 + 3 * t * t1Sq * cx1 + 3 * t1 * tSq * cx2 + t * tSq * x2);
-                    ty = (int)(t1 * t1Sq * y1 + 3 * t * t1Sq * cy1 + 3 * t1 * tSq * cy2 + t * tSq * y2);
+                    tx = (int)((t1 * t1Sq * x1) + (3 * t * t1Sq * cx1) + (3 * t1 * tSq * cx2) + (t * tSq * x2));
+                    ty = (int)((t1 * t1Sq * y1) + (3 * t * t1Sq * cy1) + (3 * t1 * tSq * cy2) + (t * tSq * y2));
 
                     list.Add(tx);
                     list.Add(ty);
@@ -1179,18 +1179,18 @@ namespace System.Windows.Media.Imaging
                 var sy1 = tension * (y3 - y1);
                 var sx2 = tension * (x4 - x2);
                 var sy2 = tension * (y4 - y2);
-                var ax = sx1 + sx2 + 2 * x2 - 2 * x3;
-                var ay = sy1 + sy2 + 2 * y2 - 2 * y3;
-                var bx = -2 * sx1 - sx2 - 3 * x2 + 3 * x3;
-                var by = -2 * sy1 - sy2 - 3 * y2 + 3 * y3;
+                var ax = sx1 + sx2 + (2 * x2) - (2 * x3);
+                var ay = sy1 + sy2 + (2 * y2) - (2 * y3);
+                var bx = (-2 * sx1) - sx2 - (3 * x2) + (3 * x3);
+                var by = (-2 * sy1) - sy2 - (3 * y2) + (3 * y3);
 
                 // Interpolate
                 for (var t = 0f; t <= 1; t += step)
                 {
                     var tSq = t * t;
 
-                    int tx = (int)(ax * tSq * t + bx * tSq + sx1 * t + x2);
-                    int ty = (int)(ay * tSq * t + by * tSq + sy1 * t + y2);
+                    int tx = (int)((ax * tSq * t) + (bx * tSq) + (sx1 * t) + x2);
+                    int ty = (int)((ay * tSq * t) + (by * tSq) + (sy1 * t) + y2);
 
                     list.Add(tx);
                     list.Add(ty);

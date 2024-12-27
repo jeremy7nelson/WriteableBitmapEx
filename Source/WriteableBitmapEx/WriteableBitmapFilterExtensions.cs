@@ -147,7 +147,7 @@ namespace System.Windows.Media.Imaging
                                         py = h - 1;
                                     }
 
-                                    var col = pixels[py * w + px];
+                                    var col = pixels[(py * w) + px];
                                     var k = kernel[ky + kwh, kx + khh];
                                     a += ((col >> 24) & 0x000000FF) * k;
                                     r += ((col >> 16) & 0x000000FF) * k;
@@ -156,10 +156,10 @@ namespace System.Windows.Media.Imaging
                                 }
                             }
 
-                            var ta = ((a / kernelFactorSum) + kernelOffsetSum);
-                            var tr = ((r / kernelFactorSum) + kernelOffsetSum);
-                            var tg = ((g / kernelFactorSum) + kernelOffsetSum);
-                            var tb = ((b / kernelFactorSum) + kernelOffsetSum);
+                            var ta = (a / kernelFactorSum) + kernelOffsetSum;
+                            var tr = (r / kernelFactorSum) + kernelOffsetSum;
+                            var tg = (g / kernelFactorSum) + kernelOffsetSum;
+                            var tb = (b / kernelFactorSum) + kernelOffsetSum;
 
                             // Clamp to byte boundaries
                             var ba = (byte)((ta > 255) ? 255 : ((ta < 0) ? 0 : ta));
@@ -250,7 +250,7 @@ namespace System.Windows.Media.Imaging
                         var b = (c) & 0x000000FF;
 
                         // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                        var gray = (r * 6966 + g * 23436 + b * 2366) >> 15;
+                        var gray = ((r * 6966) + (g * 23436) + (b * 2366)) >> 15;
                         r = g = b = gray;
 
                         // Set
@@ -270,7 +270,7 @@ namespace System.Windows.Media.Imaging
         /// <returns>The new WriteableBitmap.</returns>
         public static WriteableBitmap AdjustContrast(this WriteableBitmap bmp, double level)
         {
-            var factor = (int)((259.0 * (level + 255.0)) / (255.0 * (259.0 - level)) * 255.0);
+            var factor = (int)(259.0 * (level + 255.0) / (255.0 * (259.0 - level)) * 255.0);
 
             using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
@@ -388,9 +388,9 @@ namespace System.Windows.Media.Imaging
                         var b = (c) & 0x000000FF;
 
                         // Gamma adjustment
-                        r = (int)(255.0 * Math.Pow((r / 255.0), gammaCorrection));
-                        g = (int)(255.0 * Math.Pow((g / 255.0), gammaCorrection));
-                        b = (int)(255.0 * Math.Pow((b / 255.0), gammaCorrection));
+                        r = (int)(255.0 * Math.Pow(r / 255.0, gammaCorrection));
+                        g = (int)(255.0 * Math.Pow(g / 255.0, gammaCorrection));
+                        b = (int)(255.0 * Math.Pow(b / 255.0, gammaCorrection));
 
                         // Clamps
                         r = r < 0 ? 0 : r > 255 ? 255 : r;

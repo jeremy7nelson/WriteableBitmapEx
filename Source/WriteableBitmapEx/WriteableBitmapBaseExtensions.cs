@@ -184,11 +184,11 @@ namespace System.Windows.Media.Imaging
                             ai = 1;
                         }
                         // Scale inverse alpha to use cheap integer mul bit shift
-                        ai = ((255 << 8) / ai);
+                        ai = (255 << 8) / ai;
                         var srcColor = Color.FromArgb(a,
                                                       (byte)((((c >> 16) & 0xFF) * ai) >> 8),
                                                       (byte)((((c >> 8) & 0xFF) * ai) >> 8),
-                                                      (byte)((((c & 0xFF) * ai) >> 8)));
+                                                      (byte)(((c & 0xFF) * ai) >> 8));
 
                         var color = func(x, y, srcColor);
                         pixels[index++] = ConvertColor(color);
@@ -213,7 +213,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-                return context.Pixels[y * context.Width + x];
+                return context.Pixels[(y * context.Width) + x];
             }
         }
 
@@ -229,7 +229,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-                var c = context.Pixels[y * context.Width + x];
+                var c = context.Pixels[(y * context.Width) + x];
                 var a = (byte)(c >> 24);
 
                 // Prevent division by zero
@@ -240,11 +240,11 @@ namespace System.Windows.Media.Imaging
                 }
 
                 // Scale inverse alpha to use cheap integer mul bit shift
-                ai = ((255 << 8) / ai);
+                ai = (255 << 8) / ai;
                 return Color.FromArgb(a,
                                      (byte)((((c >> 16) & 0xFF) * ai) >> 8),
                                      (byte)((((c >> 8) & 0xFF) * ai) >> 8),
-                                     (byte)((((c & 0xFF) * ai) >> 8)));
+                                     (byte)(((c & 0xFF) * ai) >> 8));
             }
         }
 
@@ -260,13 +260,13 @@ namespace System.Windows.Media.Imaging
             using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
                 // Extract color components
-                var c = context.Pixels[y * context.Width + x];
+                var c = context.Pixels[(y * context.Width) + x];
                 var r = (byte)(c >> 16);
                 var g = (byte)(c >> 8);
-                var b = (byte)(c);
+                var b = (byte)c;
 
                 // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                return (byte)((r * 6966 + g * 23436 + b * 2366) >> 15);
+                return (byte)(((r * 6966) + (g * 23436) + (b * 2366)) >> 15);
             }
         }
 
@@ -307,7 +307,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = (255 << 24) | (r << 16) | (g << 8) | b;
+                context.Pixels[(y * context.Width) + x] = (255 << 24) | (r << 16) | (g << 8) | b;
             }
         }
 
@@ -348,7 +348,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = (a << 24) | (r << 16) | (g << 8) | b;
+                context.Pixels[(y * context.Width) + x] = (a << 24) | (r << 16) | (g << 8) | b;
             }
         }
 
@@ -383,7 +383,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = ConvertColor(color);
+                context.Pixels[(y * context.Width) + x] = ConvertColor(color);
             }
         }
 
@@ -423,7 +423,7 @@ namespace System.Windows.Media.Imaging
             {
                 // Add one to use mul and cheap bit shift for multiplicaltion
                 var ai = a + 1;
-                context.Pixels[y * context.Width + x] = (a << 24)
+                context.Pixels[(y * context.Width) + x] = (a << 24)
                                              | ((byte)((color.R * ai) >> 8) << 16)
                                              | ((byte)((color.G * ai) >> 8) << 8)
                                              | ((byte)((color.B * ai) >> 8));
@@ -457,7 +457,7 @@ namespace System.Windows.Media.Imaging
         {
             using (var context = bmp.GetBitmapContext())
             {
-                context.Pixels[y * context.Width + x] = color;
+                context.Pixels[(y * context.Width) + x] = color;
             }
         }
 
