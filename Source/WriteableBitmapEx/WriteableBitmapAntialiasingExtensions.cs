@@ -29,12 +29,18 @@ namespace System.Windows.Media.Imaging
         private static void AAWidthLine(int width, int height, BitmapContext context, float x1, float y1, float x2, float y2, float lineWidth, Int32 color, Rect? clipRect = null)
         {
             // Perform cohen-sutherland clipping if either point is out of the viewport
-            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, width, height), ref x1, ref y1, ref x2, ref y2)) return;
+            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, width, height), ref x1, ref y1, ref x2, ref y2))
+            {
+                return;
+            }
 
             leftEdgeX = new int[height];
             rightEdgeX = new int[height];
 
-            if (lineWidth <= 0) return;
+            if (lineWidth <= 0)
+            {
+                return;
+            }
 
             var buffer = context.Pixels;
 
@@ -50,22 +56,39 @@ namespace System.Windows.Media.Imaging
                 x2 += (int)lineWidth / 2;
 
                 if (x1 < 0)
+                {
                     x1 = 0;
+                }
+
                 if (x2 < 0)
+                {
                     return;
+                }
 
                 if (x1 >= width)
+                {
                     return;
+                }
+
                 if (x2 >= width)
+                {
                     x2 = width - 1;
+                }
 
                 if (y1 >= height || y2 < 0)
+                {
                     return;
+                }
 
                 if (y1 < 0)
+                {
                     y1 = 0;
+                }
+
                 if (y2 >= height)
+                {
                     y2 = height - 1;
+                }
 
                 for (var x = (int)x1; x <= x2; x++)
                 {
@@ -103,21 +126,48 @@ namespace System.Windows.Media.Imaging
             }
             if (y1 == y2)
             {
-                if (x1 > x2) Swap(ref x1, ref x2);
+                if (x1 > x2)
+                {
+                    Swap(ref x1, ref x2);
+                }
 
                 y1 -= (int)lineWidth / 2;
                 y2 += (int)lineWidth / 2;
 
-                if (y1 < 0) y1 = 0;
-                if (y2 < 0) return;
+                if (y1 < 0)
+                {
+                    y1 = 0;
+                }
 
-                if (y1 >= height) return;
-                if (y2 >= height) y2 = height - 1;
+                if (y2 < 0)
+                {
+                    return;
+                }
 
-                if (x1 >= width || y2 < 0) return;
+                if (y1 >= height)
+                {
+                    return;
+                }
 
-                if (x1 < 0) x1 = 0;
-                if (x2 >= width) x2 = width - 1;
+                if (y2 >= height)
+                {
+                    y2 = height - 1;
+                }
+
+                if (x1 >= width || y2 < 0)
+                {
+                    return;
+                }
+
+                if (x1 < 0)
+                {
+                    x1 = 0;
+                }
+
+                if (x2 >= width)
+                {
+                    x2 = width - 1;
+                }
 
                 for (var x = (int)x1; x <= x2; x++)
                 {
@@ -230,8 +280,15 @@ namespace System.Windows.Media.Imaging
             int starty = Math.Min(Math.Min(iy1, iy2), Math.Min(iy3, iy4));
             int endy = Math.Max(Math.Max(iy1, iy2), Math.Max(iy3, iy4));
 
-            if (starty < 0) starty = -1;
-            if (endy >= height) endy = height + 1;
+            if (starty < 0)
+            {
+                starty = -1;
+            }
+
+            if (endy >= height)
+            {
+                endy = height + 1;
+            }
 
             for (int y = starty + 1; y < endy - 1; y++)
             {
@@ -251,13 +308,27 @@ namespace System.Windows.Media.Imaging
 
             if (x1 < x2)
             {
-                if (iy2 >= 0 && iy2 < height) rightEdgeX[iy2] = Math.Min(ix2, rightEdgeX[iy2]);
-                if (iy3 >= 0 && iy3 < height) leftEdgeX[iy3] = Math.Max(ix3, leftEdgeX[iy3]);
+                if (iy2 >= 0 && iy2 < height)
+                {
+                    rightEdgeX[iy2] = Math.Min(ix2, rightEdgeX[iy2]);
+                }
+
+                if (iy3 >= 0 && iy3 < height)
+                {
+                    leftEdgeX[iy3] = Math.Max(ix3, leftEdgeX[iy3]);
+                }
             }
             else
             {
-                if (iy1 >= 0 && iy1 < height) rightEdgeX[iy1] = Math.Min(ix1, rightEdgeX[iy1]);
-                if (iy4 >= 0 && iy4 < height) leftEdgeX[iy4] = Math.Max(ix4, leftEdgeX[iy4]);
+                if (iy1 >= 0 && iy1 < height)
+                {
+                    rightEdgeX[iy1] = Math.Min(ix1, rightEdgeX[iy1]);
+                }
+
+                if (iy4 >= 0 && iy4 < height)
+                {
+                    leftEdgeX[iy4] = Math.Max(ix4, leftEdgeX[iy4]);
+                }
             }
 
             //return;
@@ -309,10 +380,20 @@ namespace System.Windows.Media.Imaging
         {
             Byte off = 0;
 
-            if (minEdge) off = 0xff;
+            if (minEdge)
+            {
+                off = 0xff;
+            }
 
-            if (x1 == x2) return;
-            if (y1 == y2) return;
+            if (x1 == x2)
+            {
+                return;
+            }
+
+            if (y1 == y2)
+            {
+                return;
+            }
 
             var buffer = context.Pixels;
 
@@ -325,15 +406,24 @@ namespace System.Windows.Media.Imaging
             int deltax = (x2 - x1);
             int deltay = (y2 - y1);
 
-            if (x1 > x2) deltax = (x1 - x2);
+            if (x1 > x2)
+            {
+                deltax = (x1 - x2);
+            }
 
             int x = x1;
             int y = y1;
 
             UInt16 m = 0;
 
-            if (deltax > deltay) m = (ushort)(((deltay << 16) / deltax));
-            else m = (ushort)(((deltax << 16) / deltay));
+            if (deltax > deltay)
+            {
+                m = (ushort)(((deltay << 16) / deltax));
+            }
+            else
+            {
+                m = (ushort)(((deltax << 16) / deltay));
+            }
 
             UInt16 e = 0;
 
@@ -362,15 +452,33 @@ namespace System.Windows.Media.Imaging
 
                     e += m;
 
-                    if (x1 < x2) x++;
-                    else x--;
+                    if (x1 < x2)
+                    {
+                        x++;
+                    }
+                    else
+                    {
+                        x--;
+                    }
 
-                    if (y < 0 || y >= height) continue;
+                    if (y < 0 || y >= height)
+                    {
+                        continue;
+                    }
 
-                    if (leftEdge) leftEdgeX[y] = Math.Max(x + 1, leftEdgeX[y]);
-                    else rightEdgeX[y] = Math.Min(x - 1, rightEdgeX[y]);
+                    if (leftEdge)
+                    {
+                        leftEdgeX[y] = Math.Max(x + 1, leftEdgeX[y]);
+                    }
+                    else
+                    {
+                        rightEdgeX[y] = Math.Min(x - 1, rightEdgeX[y]);
+                    }
 
-                    if (x < 0 || x >= width) continue;
+                    if (x < 0 || x >= width)
+                    {
+                        continue;
+                    }
 
                     //
 
@@ -403,16 +511,29 @@ namespace System.Windows.Media.Imaging
                 {
                     if ((UInt16)(e + m) <= e) // Roll
                     {
-                        if (x1 < x2) x++;
-                        else x--;
+                        if (x1 < x2)
+                        {
+                            x++;
+                        }
+                        else
+                        {
+                            x--;
+                        }
                     }
 
                     e += m;
 
                     y++;
 
-                    if (x < 0 || x >= width) continue;
-                    if (y < 0 || y >= height) continue;
+                    if (x < 0 || x >= width)
+                    {
+                        continue;
+                    }
+
+                    if (y < 0 || y >= height)
+                    {
+                        continue;
+                    }
 
                     //
 
@@ -434,8 +555,14 @@ namespace System.Windows.Media.Imaging
 
                     buffer[y * width + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
 
-                    if (leftEdge) leftEdgeX[y] = x + 1;
-                    else rightEdgeX[y] = x - 1;
+                    if (leftEdge)
+                    {
+                        leftEdgeX[y] = x + 1;
+                    }
+                    else
+                    {
+                        rightEdgeX[y] = x - 1;
+                    }
                 }
             }
         }

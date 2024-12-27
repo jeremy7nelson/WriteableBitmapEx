@@ -76,7 +76,9 @@ namespace System.Windows.Media.Imaging
         {
             var numberOfChannels = bmp.BackBufferStride / bmp.PixelWidth;
             if (numberOfChannels != SizeOfArgb)
+            {
                 throw new NotSupportedException("The format of this image is not supported, Consider calling BitmapFactory.ConvertToPbgra32Format()");
+            }
 
             using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
@@ -90,10 +92,25 @@ namespace System.Windows.Media.Imaging
                 }
 
                 // Clamp to boundaries
-                if (x < 0) x = 0;
-                if (x + width > srcWidth) width = srcWidth - x;
-                if (y < 0) y = 0;
-                if (y + height > srcHeight) height = srcHeight - y;
+                if (x < 0)
+                {
+                    x = 0;
+                }
+
+                if (x + width > srcWidth)
+                {
+                    width = srcWidth - x;
+                }
+
+                if (y < 0)
+                {
+                    y = 0;
+                }
+
+                if (y + height > srcHeight)
+                {
+                    height = srcHeight - y;
+                }
 
                 // Copy the pixels line by line using fast BlockCopy
                 var result = BitmapFactory.New(width, height);
@@ -493,7 +510,10 @@ namespace System.Windows.Media.Imaging
 
                             // check bounds
                             if (iFloorX < 0 || iCeilingX < 0 || iFloorX >= iWidth || iCeilingX >= iWidth || iFloorY < 0 ||
-                                iCeilingY < 0 || iFloorY >= iHeight || iCeilingY >= iHeight) continue;
+                                iCeilingY < 0 || iFloorY >= iHeight || iCeilingY >= iHeight)
+                            {
+                                continue;
+                            }
 
                             fDeltaX = fTrueX - iFloorX;
                             fDeltaY = fTrueY - iFloorY;
@@ -521,14 +541,45 @@ namespace System.Windows.Media.Imaging
                             iAlpha = (int)(Math.Round((1 - fDeltaY) * fTopAlpha + fDeltaY * fBottomAlpha));
 
                             // make sure color values are valid
-                            if (iRed < 0) iRed = 0;
-                            if (iRed > 255) iRed = 255;
-                            if (iGreen < 0) iGreen = 0;
-                            if (iGreen > 255) iGreen = 255;
-                            if (iBlue < 0) iBlue = 0;
-                            if (iBlue > 255) iBlue = 255;
-                            if (iAlpha < 0) iAlpha = 0;
-                            if (iAlpha > 255) iAlpha = 255;
+                            if (iRed < 0)
+                            {
+                                iRed = 0;
+                            }
+
+                            if (iRed > 255)
+                            {
+                                iRed = 255;
+                            }
+
+                            if (iGreen < 0)
+                            {
+                                iGreen = 0;
+                            }
+
+                            if (iGreen > 255)
+                            {
+                                iGreen = 255;
+                            }
+
+                            if (iBlue < 0)
+                            {
+                                iBlue = 0;
+                            }
+
+                            if (iBlue > 255)
+                            {
+                                iBlue = 255;
+                            }
+
+                            if (iAlpha < 0)
+                            {
+                                iAlpha = 0;
+                            }
+
+                            if (iAlpha > 255)
+                            {
+                                iAlpha = 255;
+                            }
 
                             var a = iAlpha + 1;
                             newp[i * newWidth + j] = (iAlpha << 24)

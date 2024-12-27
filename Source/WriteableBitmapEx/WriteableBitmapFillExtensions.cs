@@ -266,10 +266,25 @@ namespace System.Windows.Media.Imaging
                     ly = yc - y - 1;
 
                     // Clip
-                    if (uy < 0) uy = 0;
-                    if (uy >= h) uy = h - 1;
-                    if (ly < 0) ly = 0;
-                    if (ly >= h) ly = h - 1;
+                    if (uy < 0)
+                    {
+                        uy = 0;
+                    }
+
+                    if (uy >= h)
+                    {
+                        uy = h - 1;
+                    }
+
+                    if (ly < 0)
+                    {
+                        ly = 0;
+                    }
+
+                    if (ly >= h)
+                    {
+                        ly = h - 1;
+                    }
 
                     // Upper half
                     uh = uy * w;
@@ -280,10 +295,25 @@ namespace System.Windows.Media.Imaging
                     lx = xc - x;
 
                     // Clip
-                    if (rx < 0) rx = 0;
-                    if (rx >= w) rx = w - 1;
-                    if (lx < 0) lx = 0;
-                    if (lx >= w) lx = w - 1;
+                    if (rx < 0)
+                    {
+                        rx = 0;
+                    }
+
+                    if (rx >= w)
+                    {
+                        rx = w - 1;
+                    }
+
+                    if (lx < 0)
+                    {
+                        lx = 0;
+                    }
+
+                    if (lx >= w)
+                    {
+                        lx = w - 1;
+                    }
 
                     // Draw line
                     if (noBlending)
@@ -330,10 +360,25 @@ namespace System.Windows.Media.Imaging
                 ly = yc - y;
 
                 // Clip
-                if (uy < 0) uy = 0;
-                if (uy >= h) uy = h - 1;
-                if (ly < 0) ly = 0;
-                if (ly >= h) ly = h - 1;
+                if (uy < 0)
+                {
+                    uy = 0;
+                }
+
+                if (uy >= h)
+                {
+                    uy = h - 1;
+                }
+
+                if (ly < 0)
+                {
+                    ly = 0;
+                }
+
+                if (ly >= h)
+                {
+                    ly = h - 1;
+                }
 
                 // Upper half
                 uh = uy * w;
@@ -354,10 +399,25 @@ namespace System.Windows.Media.Imaging
                     lx = xc - x;
 
                     // Clip
-                    if (rx < 0) rx = 0;
-                    if (rx >= w) rx = w - 1;
-                    if (lx < 0) lx = 0;
-                    if (lx >= w) lx = w - 1;
+                    if (rx < 0)
+                    {
+                        rx = 0;
+                    }
+
+                    if (rx >= w)
+                    {
+                        rx = w - 1;
+                    }
+
+                    if (lx < 0)
+                    {
+                        lx = 0;
+                    }
+
+                    if (lx >= w)
+                    {
+                        lx = w - 1;
+                    }
 
                     // Draw line
                     if (noBlending)
@@ -389,10 +449,26 @@ namespace System.Windows.Media.Imaging
                         y--;
                         uy = yc + y; // Upper half
                         ly = yc - y; // Lower half
-                        if (uy < 0) uy = 0; // Clip
-                        if (uy >= h) uy = h - 1; // ...
-                        if (ly < 0) ly = 0;
-                        if (ly >= h) ly = h - 1;
+                        if (uy < 0)
+                        {
+                            uy = 0; // Clip
+                        }
+
+                        if (uy >= h)
+                        {
+                            uy = h - 1; // ...
+                        }
+
+                        if (ly < 0)
+                        {
+                            ly = 0;
+                        }
+
+                        if (ly >= h)
+                        {
+                            ly = h - 1;
+                        }
+
                         uh = uy * w; // Upper half
                         lh = ly * w; // Lower half
                         yStopping -= xrSqTwo;
@@ -453,11 +529,25 @@ namespace System.Windows.Media.Imaging
                 for (int i = 1; i < pn; i += 2)
                 {
                     int py = points[i];
-                    if (py < yMin) yMin = py;
-                    if (py > yMax) yMax = py;
+                    if (py < yMin)
+                    {
+                        yMin = py;
+                    }
+
+                    if (py > yMax)
+                    {
+                        yMax = py;
+                    }
                 }
-                if (yMin < 0) yMin = 0;
-                if (yMax >= h) yMax = h - 1;
+                if (yMin < 0)
+                {
+                    yMin = 0;
+                }
+
+                if (yMax >= h)
+                {
+                    yMax = h - 1;
+                }
 
                 // Scan line from min to max
                 for (int y = yMin; y <= yMax; y++)
@@ -510,8 +600,15 @@ namespace System.Windows.Media.Imaging
                         // Check boundary
                         if (x1 > 0 && x0 < w)
                         {
-                            if (x0 < 0) x0 = 0;
-                            if (x1 >= w) x1 = w - 1;
+                            if (x0 < 0)
+                            {
+                                x0 = 0;
+                            }
+
+                            if (x1 >= w)
+                            {
+                                x1 = w - 1;
+                            }
 
                             // Fill the pixels
                             for (int x = x0; x <= x1; x++)
@@ -707,7 +804,11 @@ namespace System.Windows.Media.Imaging
                             Edge edge = new Edge(lastX, lastY, px, py);
                             if (edge.StartY < h && edge.EndY >= 0)
                             {
-                                if (edge.EndY > yMax) yMax = edge.EndY;
+                                if (edge.EndY > yMax)
+                                {
+                                    yMax = edge.EndY;
+                                }
+
                                 edges.Add(edge);
                             }
                         }
@@ -721,11 +822,17 @@ namespace System.Windows.Media.Imaging
                     return;
                 }
 
-                if (yMax >= h) yMax = h - 1;
+                if (yMax >= h)
+                {
+                    yMax = h - 1;
+                }
 
                 edges.Sort();
                 int yMin = edges[0].StartY;
-                if (yMin < 0) yMin = 0;
+                if (yMin < 0)
+                {
+                    yMin = 0;
+                }
 
                 int[] intersectionsX = new int[edges.Count];
 
@@ -784,8 +891,16 @@ namespace System.Windows.Media.Imaging
                         int x0 = intersectionsX[i];
                         int x1 = intersectionsX[i + 1];
 
-                        if (x0 < 0) x0 = 0;
-                        if (x1 >= w) x1 = w - 1;
+                        if (x0 < 0)
+                        {
+                            x0 = 0;
+                        }
+
+                        if (x1 >= w)
+                        {
+                            x1 = w - 1;
+                        }
+
                         if (x1 < x0)
                         {
                             continue;

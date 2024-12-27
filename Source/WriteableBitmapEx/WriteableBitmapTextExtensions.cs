@@ -51,7 +51,9 @@ namespace System.Windows.Media.Imaging
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
+                {
                     FillGeometry(bmp, itm, color);
+                }
             }
             else if (geometry is PathGeometry pg)
             {
@@ -114,7 +116,9 @@ namespace System.Windows.Media.Imaging
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
+                {
                     DrawGeometry(bmp, itm, color);
+                }
             }
             else if (geometry is PathGeometry pg)
             {
@@ -129,7 +133,9 @@ namespace System.Windows.Media.Imaging
                 }
 
                 foreach (var item in polygons)
+                {
                     bmp.DrawPolyline(item, color);
+                }
             }
         }
 
@@ -138,7 +144,9 @@ namespace System.Windows.Media.Imaging
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
+                {
                     DrawGeometryAa(bmp, itm, col, thickness);
+                }
             }
             else if (geometry is PathGeometry pg)
             {
@@ -153,7 +161,9 @@ namespace System.Windows.Media.Imaging
                 }
 
                 foreach (var item in polygons)
+                {
                     bmp.DrawPolylineAa(item, col, thickness);
+                }
             }
         }
 
@@ -164,7 +174,10 @@ namespace System.Windows.Media.Imaging
         //converts the PathFigure (consis of curve, line etc) to int array polygon
         private static void ToWriteableBitmapPolygon(PathFigure fig, List<int> buf)
         {
-            if (buf.Count != 0) buf.Clear();
+            if (buf.Count != 0)
+            {
+                buf.Clear();
+            }
 
             {
                 var geo = fig;

@@ -197,8 +197,16 @@ namespace System.Windows.Media.Imaging
                                 var xx = x + offset;
                                 var wx = sourceWidth - offset;
                                 var len = xx + wx < dpw ? wx : dpw - xx;
-                                if (len > sw) len = sw;
-                                if (len > dw) len = dw;
+                                if (len > sw)
+                                {
+                                    len = sw;
+                                }
+
+                                if (len > dw)
+                                {
+                                    len = dw;
+                                }
+
                                 BitmapContext.BlockCopy(srcContext, (sourceIdx + offset) * 4, destContext, (idx + offset) * 4, len * 4);
                             }
 
@@ -482,13 +490,19 @@ namespace System.Windows.Media.Imaging
 
             using (BitmapContext destContext = bmp.GetBitmapContext())
             {
-                if (transform == null) transform = new MatrixTransform();
+                if (transform == null)
+                {
+                    transform = new MatrixTransform();
+                }
 
                 var destPixels = destContext.Pixels;
                 int destWidth = destContext.Width;
                 int destHeight = destContext.Height;
                 var inverse = transform.Inverse;
-                if(shouldClear) destContext.Clear();
+                if(shouldClear)
+                {
+                    destContext.Clear();
+                }
 
                 using (BitmapContext sourceContext = source.GetBitmapContext(ReadWriteMode.ReadOnly))
                 {
@@ -539,8 +553,15 @@ namespace System.Windows.Media.Imaging
                                 int xFloor = sourceX >> PRECISION_SHIFT;
                                 int yFloor = sourceY >> PRECISION_SHIFT;
 
-                                if (xFloor < 0) xFloor = 0;
-                                if (yFloor < 0) yFloor = 0;
+                                if (xFloor < 0)
+                                {
+                                    xFloor = 0;
+                                }
+
+                                if (yFloor < 0)
+                                {
+                                    yFloor = 0;
+                                }
 
                                 int xCeil = xFloor + 1;
                                 int yCeil = yFloor + 1;

@@ -43,34 +43,25 @@ namespace System.Windows.Media.Imaging
     /// <remarks>Attempting to put as many preprocessor hacks in this file, to keep the rest of the codebase relatively clean</remarks>
     public unsafe struct BitmapContext : IDisposable
     {
-        private readonly WriteableBitmap _writeableBitmap;
         private readonly ReadWriteMode _mode;
-
-        private readonly int _pixelWidth;
-        private readonly int _pixelHeight;
-
-      private readonly static IDictionary<WriteableBitmap, int> UpdateCountByBmp = new ConcurrentDictionary<WriteableBitmap, int>();
-      private readonly static IDictionary<WriteableBitmap, BitmapContextBitmapProperties> BitmapPropertiesByBmp = new ConcurrentDictionary<WriteableBitmap, BitmapContextBitmapProperties>();
-
-      private readonly int _length;
-      private readonly int* _backBuffer;
-      private readonly PixelFormat _format;
-      private readonly int _backBufferStride;
+        private static readonly IDictionary<WriteableBitmap, int> UpdateCountByBmp = new ConcurrentDictionary<WriteableBitmap, int>();
+        private static readonly IDictionary<WriteableBitmap, BitmapContextBitmapProperties> BitmapPropertiesByBmp = new ConcurrentDictionary<WriteableBitmap, BitmapContextBitmapProperties>();
+        private readonly int _backBufferStride;
 
         /// <summary>
         /// The Bitmap
         /// </summary>
-        public WriteableBitmap WriteableBitmap { get { return _writeableBitmap; } }
+        public WriteableBitmap WriteableBitmap { get; }
 
         /// <summary>
         /// Width of the bitmap
         /// </summary>
-        public int Width { get { return _pixelWidth; } }
+        public int Width { get; }
 
         /// <summary>
         /// Height of the bitmap
         /// </summary>
-        public int Height { get { return _pixelHeight; } }
+        public int Height { get; }
 
         /// <summary>
         /// Creates an instance of a BitmapContext, with default mode = ReadWrite
@@ -88,7 +79,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="mode"></param>
         public BitmapContext(WriteableBitmap writeableBitmap, ReadWriteMode mode)
         {
-            _writeableBitmap = writeableBitmap;
+            WriteableBitmap = writeableBitmap;
             _mode = mode;
 
          //// Check if it's the Pbgra32 pixel format
@@ -130,51 +121,48 @@ namespace System.Windows.Media.Imaging
                 }
 
                 _backBufferStride = bitmapProperties.BackBufferStride;
-                _pixelWidth = bitmapProperties.Width;
-                _pixelHeight = bitmapProperties.Height;
-                _format = bitmapProperties.Format;
-                _backBuffer = bitmapProperties.Pixels;
+                Width = bitmapProperties.Width;
+                Height = bitmapProperties.Height;
+                Format = bitmapProperties.Format;
+                Pixels = bitmapProperties.Pixels;
 
                 double width = _backBufferStride / WriteableBitmapExtensions.SizeOfArgb;
-                _length = (int)(width * _pixelHeight);
+                Length = (int)(width * Height);
             }
         }
 
-      /// <summary>
-      /// The pixels as ARGB integer values, where each channel is 8 bit.
-      /// </summary>
-      public unsafe int* Pixels
-      {
-         [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
-         get { return _backBuffer; }
-      }
+        /// <summary>
+        /// The pixels as ARGB integer values, where each channel is 8 bit.
+        /// </summary>
+        public unsafe int* Pixels
+        {
+            [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+            get;
+        }
 
-      /// <summary>
-      /// The pixel format
-      /// </summary>
-      public PixelFormat Format
-      {
-          [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
-          get { return _format; }
-      }
+        /// <summary>
+        /// The pixel format
+        /// </summary>
+        public PixelFormat Format
+        {
+            [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+            get;
+        }
 
-      /// <summary>
-      /// The number of pixels.
-      /// </summary>
-      public int Length
-      {
-         [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
-         get
-         {
-            return _length;
-         }
-      }
+        /// <summary>
+        /// The number of pixels.
+        /// </summary>
+        public int Length
+        {
+            [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+            get;
+        }
 
-      /// <summary>
-      /// Performs a Copy operation from source to destination BitmapContext
-      /// </summary>
-      /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
-      [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
+        /// <summary>
+        /// Performs a Copy operation from source to destination BitmapContext
+        /// </summary>
+        /// <remarks>Equivalent to calling Buffer.BlockCopy in Silverlight, or native memcpy in WPF</remarks>
+        [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public static unsafe void BlockCopy(BitmapContext src, int srcOffset, BitmapContext dest, int destOffset, int count)
       {
          NativeMethods.CopyUnmanagedMemory((byte*)src.Pixels, srcOffset, (byte*)dest.Pixels, destOffset, count);
@@ -238,7 +226,7 @@ namespace System.Windows.Media.Imaging
       [TargetedPatchingOptOut("Candidate for inlining across NGen boundaries for performance reasons")]
       public void Clear()
       {
-         NativeMethods.SetUnmanagedMemory((IntPtr)_backBuffer, 0, _backBufferStride * _pixelHeight);
+         NativeMethods.SetUnmanagedMemory((IntPtr)Pixels, 0, _backBufferStride * Height);
       }
 
       /// <summary>
@@ -247,20 +235,20 @@ namespace System.Windows.Media.Imaging
       public void Dispose()
       {
          // Decrement the update count. If it hits zero
-         if (DecrementRefCount(_writeableBitmap) == 0)
+         if (DecrementRefCount(WriteableBitmap) == 0)
          {
             // Remove this bitmap from the update map 
-            UpdateCountByBmp.Remove(_writeableBitmap);
-            BitmapPropertiesByBmp.Remove(_writeableBitmap);
+            UpdateCountByBmp.Remove(WriteableBitmap);
+            BitmapPropertiesByBmp.Remove(WriteableBitmap);
 
             // Invalidate the bitmap if ReadWrite _mode
             if (_mode == ReadWriteMode.ReadWrite)
             {
-               _writeableBitmap.AddDirtyRect(new Int32Rect(0, 0, _pixelWidth, _pixelHeight));
+               WriteableBitmap.AddDirtyRect(new Int32Rect(0, 0, Width, Height));
             }
 
             // Unlock the bitmap
-            _writeableBitmap.Unlock();
+            WriteableBitmap.Unlock();
          }
       }
 
@@ -271,8 +259,7 @@ namespace System.Windows.Media.Imaging
 
         private static int DecrementRefCount(WriteableBitmap target)
         {
-            int current;
-            if (!UpdateCountByBmp.TryGetValue(target, out current))
+            if (!UpdateCountByBmp.TryGetValue(target, out int current))
             {
                 return -1;
             }

@@ -305,7 +305,10 @@ namespace System.Windows.Media.Imaging
             }
 
             // Perform cohen-sutherland clipping if either point is out of the viewport
-            if (!CohenSutherlandLineClip(new Rect(clipX1, clipY1, clipX2 - clipX1, clipY2 - clipY1), ref x1, ref y1, ref x2, ref y2)) return;
+            if (!CohenSutherlandLineClip(new Rect(clipX1, clipY1, clipX2 - clipX1, clipY2 - clipY1), ref x1, ref y1, ref x2, ref y2))
+            {
+                return;
+            }
 
             var pixels = context.Pixels;
 
@@ -599,13 +602,20 @@ namespace System.Windows.Media.Imaging
         {
             // Edge case where lines that went out of vertical bounds clipped instead of disappearing
             if((y1 < 0 && y2 < 0) || (y1 > h && y2 > h))
+            {
                 return;
+            }
 
             if (x1 == x2 && y1 == y2)
+            {
                 return;
+            }
 
             // Perform cohen-sutherland clipping if either point is out of the viewport
-            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, w, h), ref x1, ref y1, ref x2, ref y2)) return;
+            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, w, h), ref x1, ref y1, ref x2, ref y2))
+            {
+                return;
+            }
 
             int size = pen.Width;
             int pw = size;
@@ -719,13 +729,22 @@ namespace System.Windows.Media.Imaging
             byte code = INSIDE;
 
             if (x < extents.Left)           // to the left of clip window
+            {
                 code |= LEFT;
+            }
             else if (x > extents.Right)     // to the right of clip window
+            {
                 code |= RIGHT;
+            }
+
             if (y > extents.Bottom)         // below the clip window
+            {
                 code |= BOTTOM;
+            }
             else if (y < extents.Top)       // above the clip window
+            {
                 code |= TOP;
+            }
 
             return code;
         }
@@ -980,7 +999,10 @@ namespace System.Windows.Media.Imaging
         public static void DrawLineWu(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int sa, int sr, int sg, int sb, Rect? clipRect = null)
         {
             // Perform cohen-sutherland clipping if either point is out of the viewport
-            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, pixelWidth, pixelHeight), ref x1, ref y1, ref x2, ref y2)) return;
+            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, pixelWidth, pixelHeight), ref x1, ref y1, ref x2, ref y2))
+            {
+                return;
+            }
 
             var pixels = context.Pixels;
 
@@ -1257,20 +1279,56 @@ namespace System.Windows.Media.Imaging
         /// </summary> 
         public static void DrawLineAa(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
-            if ((x1 == x2) && (y1 == y2)) return; // edge case causing invDFloat to overflow, found by Shai Rubinshtein
+            if ((x1 == x2) && (y1 == y2))
+            {
+                return; // edge case causing invDFloat to overflow, found by Shai Rubinshtein
+            }
 
             // Perform cohen-sutherland clipping if either point is out of the viewport
-            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, pixelWidth, pixelHeight), ref x1, ref y1, ref x2, ref y2)) return;
+            if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, pixelWidth, pixelHeight), ref x1, ref y1, ref x2, ref y2))
+            {
+                return;
+            }
 
-            if (x1 < 1) x1 = 1;
-            if (x1 > pixelWidth - 2) x1 = pixelWidth - 2;
-            if (y1 < 1) y1 = 1;
-            if (y1 > pixelHeight - 2) y1 = pixelHeight - 2;
+            if (x1 < 1)
+            {
+                x1 = 1;
+            }
 
-            if (x2 < 1) x2 = 1;
-            if (x2 > pixelWidth - 2) x2 = pixelWidth - 2;
-            if (y2 < 1) y2 = 1;
-            if (y2 > pixelHeight - 2) y2 = pixelHeight - 2;
+            if (x1 > pixelWidth - 2)
+            {
+                x1 = pixelWidth - 2;
+            }
+
+            if (y1 < 1)
+            {
+                y1 = 1;
+            }
+
+            if (y1 > pixelHeight - 2)
+            {
+                y1 = pixelHeight - 2;
+            }
+
+            if (x2 < 1)
+            {
+                x2 = 1;
+            }
+
+            if (x2 > pixelWidth - 2)
+            {
+                x2 = pixelWidth - 2;
+            }
+
+            if (y2 < 1)
+            {
+                y2 = 1;
+            }
+
+            if (y2 > pixelHeight - 2)
+            {
+                y2 = pixelHeight - 2;
+            }
 
             var addr = y1 * pixelWidth + x1;
             var dx = x2 - x1;
@@ -1290,8 +1348,15 @@ namespace System.Windows.Media.Imaging
 
             // By switching to (u,v), we combine all eight octants 
             int adx = dx, ady = dy;
-            if (dx < 0) adx = -dx;
-            if (dy < 0) ady = -dy;
+            if (dx < 0)
+            {
+                adx = -dx;
+            }
+
+            if (dy < 0)
+            {
+                ady = -dy;
+            }
 
             if (adx > ady)
             {
@@ -1301,8 +1366,15 @@ namespace System.Windows.Media.Imaging
                 v = y2;
                 uincr = 1;
                 vincr = pixelWidth;
-                if (dx < 0) uincr = -uincr;
-                if (dy < 0) vincr = -vincr;
+                if (dx < 0)
+                {
+                    uincr = -uincr;
+                }
+
+                if (dy < 0)
+                {
+                    vincr = -vincr;
+                }
             }
             else
             {
@@ -1312,8 +1384,15 @@ namespace System.Windows.Media.Imaging
                 v = x2;
                 uincr = pixelWidth;
                 vincr = 1;
-                if (dy < 0) uincr = -uincr;
-                if (dx < 0) vincr = -vincr;
+                if (dy < 0)
+                {
+                    uincr = -uincr;
+                }
+
+                if (dx < 0)
+                {
+                    vincr = -vincr;
+                }
             }
 
             var uend = u + du;
@@ -1424,10 +1503,14 @@ namespace System.Windows.Media.Imaging
         private static float ClipToInt(float d)
         {
             if (d > int.MaxValue)
+            {
                 return int.MaxValue;
+            }
 
             if (d < int.MinValue)
+            {
                 return int.MinValue;
+            }
 
             return d;
         }
@@ -1465,7 +1548,9 @@ namespace System.Windows.Media.Imaging
 
             // No clipping if both points lie inside viewport
             if (outcode0 == INSIDE && outcode1 == INSIDE)
+            {
                 return true;
+            }
 
             bool isValid = false;
 

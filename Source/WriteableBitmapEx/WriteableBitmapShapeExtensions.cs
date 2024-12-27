@@ -433,15 +433,29 @@ namespace System.Windows.Media.Imaging
                     if (0 <= uy && uy < h)
                     {
                         uh = uy * w;              // Upper half
-                        if (0 <= rx && rx < w) pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
-                        if (0 <= lx && lx < w) pixels[lx + uh] = color;      // Quadrant II
+                        if (0 <= rx && rx < w)
+                        {
+                            pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
+                        }
+
+                        if (0 <= lx && lx < w)
+                        {
+                            pixels[lx + uh] = color;      // Quadrant II
+                        }
                     }
 
                     if (0 <= ly && ly < h)
                     {
                         lh = ly * w;              // Lower half
-                        if (0 <= lx && lx < w) pixels[lx + lh] = color;      // Quadrant III
-                        if (0 <= rx && rx < w) pixels[rx + lh] = color;      // Quadrant IV
+                        if (0 <= lx && lx < w)
+                        {
+                            pixels[lx + lh] = color;      // Quadrant III
+                        }
+
+                        if (0 <= rx && rx < w)
+                        {
+                            pixels[rx + lh] = color;      // Quadrant IV
+                        }
                     }
 
                     y++;
@@ -477,15 +491,29 @@ namespace System.Windows.Media.Imaging
                     rx = xc + x;
                     if (0 <= rx && rx < w)
                     {
-                        if (0 <= uy && uy < h) pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
-                        if (0 <= ly && ly < h) pixels[rx + lh] = color;      // Quadrant IV
+                        if (0 <= uy && uy < h)
+                        {
+                            pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
+                        }
+
+                        if (0 <= ly && ly < h)
+                        {
+                            pixels[rx + lh] = color;      // Quadrant IV
+                        }
                     }
 
                     lx = xc - x;
                     if (0 <= lx && lx < w)
                     {
-                        if (0 <= uy && uy < h) pixels[lx + uh] = color;      // Quadrant II
-                        if (0 <= ly && ly < h) pixels[lx + lh] = color;      // Quadrant III
+                        if (0 <= uy && uy < h)
+                        {
+                            pixels[lx + uh] = color;      // Quadrant II
+                        }
+
+                        if (0 <= ly && ly < h)
+                        {
+                            pixels[lx + lh] = color;      // Quadrant III
+                        }
                     }
 
                     x++;
