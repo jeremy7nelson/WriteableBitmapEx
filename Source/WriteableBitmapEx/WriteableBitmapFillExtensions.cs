@@ -58,73 +58,71 @@ namespace System.Windows.Media.Imaging
         /// <param name="doAlphaBlend">True if alpha blending should be performed or false if not.</param>
         public static void FillRectangle(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, bool doAlphaBlend = false)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = context.Width;
+            var h = context.Height;
+
+            int sa = (color >> 24) & 0xff;
+            int sr = (color >> 16) & 0xff;
+            int sg = (color >> 8) & 0xff;
+            int sb = (color) & 0xff;
+
+            bool noBlending = !doAlphaBlend || sa == 255;
+
+            var pixels = context.Pixels;
+
+            // Check boundaries
+            if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
+             || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
+                return;
+            }
 
-                int sa = (color >> 24) & 0xff;
-                int sr = (color >> 16) & 0xff;
-                int sg = (color >> 8) & 0xff;
-                int sb = (color) & 0xff;
+            // Clamp boundaries
+            if (x1 < 0) { x1 = 0; }
+            if (y1 < 0) { y1 = 0; }
+            if (x2 < 0) { x2 = 0; }
+            if (y2 < 0) { y2 = 0; }
+            if (x1 > w) { x1 = w; }
+            if (y1 > h) { y1 = h; }
+            if (x2 > w) { x2 = w; }
+            if (y2 > h) { y2 = h; }
 
-                bool noBlending = !doAlphaBlend || sa == 255;
+            //swap values
+            if (y1 > y2)
+            {
+                y2 -= y1;
+                y1 += y2;
+                y2 = y1 - y2;
+            }
 
-                var pixels = context.Pixels;
+            // Fill first line
+            var startY = y1 * w;
+            var startYPlusX1 = startY + x1;
+            var endOffset = startY + x2;
+            for (var idx = startYPlusX1; idx < endOffset; idx++)
+            {
+                pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
+            }
 
-                // Check boundaries
-                if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
-                 || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
+            // Copy first line
+            var len = x2 - x1;
+            var srcOffsetBytes = startYPlusX1 * SizeOfArgb;
+            var offset2 = (y2 * w) + x1;
+            for (var y = startYPlusX1 + w; y < offset2; y += w)
+            {
+                if (noBlending)
                 {
-                    return;
+                    BitmapContext.BlockCopy(context, srcOffsetBytes, context, y * SizeOfArgb, len * SizeOfArgb);
+                    continue;
                 }
 
-                // Clamp boundaries
-                if (x1 < 0) { x1 = 0; }
-                if (y1 < 0) { y1 = 0; }
-                if (x2 < 0) { x2 = 0; }
-                if (y2 < 0) { y2 = 0; }
-                if (x1 > w) { x1 = w; }
-                if (y1 > h) { y1 = h; }
-                if (x2 > w) { x2 = w; }
-                if (y2 > h) { y2 = h; }
-
-                //swap values
-                if (y1 > y2)
+                // Alpha blend line
+                for (int i = 0; i < len; i++)
                 {
-                    y2 -= y1;
-                    y1 += y2;
-                    y2 = y1 - y2;
-                }
-
-                // Fill first line
-                var startY = y1 * w;
-                var startYPlusX1 = startY + x1;
-                var endOffset = startY + x2;
-                for (var idx = startYPlusX1; idx < endOffset; idx++)
-                {
-                    pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
-                }
-
-                // Copy first line
-                var len = x2 - x1;
-                var srcOffsetBytes = startYPlusX1 * SizeOfArgb;
-                var offset2 = (y2 * w) + x1;
-                for (var y = startYPlusX1 + w; y < offset2; y += w)
-                {
-                    if (noBlending)
-                    {
-                        BitmapContext.BlockCopy(context, srcOffsetBytes, context, y * SizeOfArgb, len * SizeOfArgb);
-                        continue;
-                    }
-
-                    // Alpha blend line
-                    for (int i = 0; i < len; i++)
-                    {
-                        int idx = y + i;
-                        pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
-                    }
+                    int idx = y + i;
+                    pixels[idx] = AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
                 }
             }
         }
@@ -219,145 +217,50 @@ namespace System.Windows.Media.Imaging
         public static void FillEllipseCentered(this WriteableBitmap bmp, int xc, int yc, int xr, int yr, int color, bool doAlphaBlend = false)
         {
             // Use refs for faster access (really important!) speeds up a lot!
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            var pixels = context.Pixels;
+            int w = context.Width;
+            int h = context.Height;
+
+            // Avoid endless loop
+            if (xr < 1 || yr < 1)
             {
-                var pixels = context.Pixels;
-                int w = context.Width;
-                int h = context.Height;
+                return;
+            }
 
-                // Avoid endless loop
-                if (xr < 1 || yr < 1)
-                {
-                    return;
-                }
+            // Skip completly outside objects
+            if (xc - xr >= w || xc + xr < 0 || yc - yr >= h || yc + yr < 0)
+            {
+                return;
+            }
 
-                // Skip completly outside objects
-                if (xc - xr >= w || xc + xr < 0 || yc - yr >= h || yc + yr < 0)
-                {
-                    return;
-                }
+            // Init vars
+            int uh, lh, uy, ly, lx, rx;
+            int x = xr;
+            int y = 0;
+            int xrSqTwo = (xr * xr) << 1;
+            int yrSqTwo = (yr * yr) << 1;
+            int xChg = yr * yr * (1 - (xr << 1));
+            int yChg = xr * xr;
+            int err = 0;
+            int xStopping = yrSqTwo * xr;
+            int yStopping = 0;
 
-                // Init vars
-                int uh, lh, uy, ly, lx, rx;
-                int x = xr;
-                int y = 0;
-                int xrSqTwo = (xr * xr) << 1;
-                int yrSqTwo = (yr * yr) << 1;
-                int xChg = yr * yr * (1 - (xr << 1));
-                int yChg = xr * xr;
-                int err = 0;
-                int xStopping = yrSqTwo * xr;
-                int yStopping = 0;
+            int sa = (color >> 24) & 0xff;
+            int sr = (color >> 16) & 0xff;
+            int sg = (color >> 8) & 0xff;
+            int sb = (color) & 0xff;
 
-                int sa = (color >> 24) & 0xff;
-                int sr = (color >> 16) & 0xff;
-                int sg = (color >> 8) & 0xff;
-                int sb = (color) & 0xff;
+            bool noBlending = !doAlphaBlend || sa == 255;
 
-                bool noBlending = !doAlphaBlend || sa == 255;
-
-                // Draw first set of points counter clockwise where tangent line slope > -1.
-                while (xStopping >= yStopping)
-                {
-                    // Draw 4 quadrant points at once
-                    // Upper half
-                    uy = yc + y;
-                    // Lower half
-                    ly = yc - y - 1;
-
-                    // Clip
-                    if (uy < 0)
-                    {
-                        uy = 0;
-                    }
-
-                    if (uy >= h)
-                    {
-                        uy = h - 1;
-                    }
-
-                    if (ly < 0)
-                    {
-                        ly = 0;
-                    }
-
-                    if (ly >= h)
-                    {
-                        ly = h - 1;
-                    }
-
-                    // Upper half
-                    uh = uy * w;
-                    // Lower half
-                    lh = ly * w;
-
-                    rx = xc + x;
-                    lx = xc - x;
-
-                    // Clip
-                    if (rx < 0)
-                    {
-                        rx = 0;
-                    }
-
-                    if (rx >= w)
-                    {
-                        rx = w - 1;
-                    }
-
-                    if (lx < 0)
-                    {
-                        lx = 0;
-                    }
-
-                    if (lx >= w)
-                    {
-                        lx = w - 1;
-                    }
-
-                    // Draw line
-                    if (noBlending)
-                    {
-                        for (int i = lx; i <= rx; i++)
-                        {
-                            pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
-                            pixels[i + lh] = color; // Quadrant III to IV
-                        }
-                    }
-                    else
-                    {
-                        for (int i = lx; i <= rx; i++)
-                        {
-                            // Quadrant II to I (Actually two octants)
-                            pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
-
-                            // Quadrant III to IV
-                            pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
-                        }
-                    }
-
-
-                    y++;
-                    yStopping += xrSqTwo;
-                    err += yChg;
-                    yChg += xrSqTwo;
-                    if ((xChg + (err << 1)) > 0)
-                    {
-                        x--;
-                        xStopping -= yrSqTwo;
-                        err += xChg;
-                        xChg += yrSqTwo;
-                    }
-                }
-
-                // ReInit vars
-                x = 0;
-                y = yr;
-
+            // Draw first set of points counter clockwise where tangent line slope > -1.
+            while (xStopping >= yStopping)
+            {
+                // Draw 4 quadrant points at once
                 // Upper half
                 uy = yc + y;
                 // Lower half
-                ly = yc - y;
+                ly = yc - y - 1;
 
                 // Clip
                 if (uy < 0)
@@ -385,96 +288,189 @@ namespace System.Windows.Media.Imaging
                 // Lower half
                 lh = ly * w;
 
-                xChg = yr * yr;
-                yChg = xr * xr * (1 - (yr << 1));
-                err = 0;
-                xStopping = 0;
-                yStopping = xrSqTwo * yr;
+                rx = xc + x;
+                lx = xc - x;
 
-                // Draw second set of points clockwise where tangent line slope < -1.
-                while (xStopping <= yStopping)
+                // Clip
+                if (rx < 0)
                 {
-                    // Draw 4 quadrant points at once
-                    rx = xc + x;
-                    lx = xc - x;
+                    rx = 0;
+                }
 
-                    // Clip
-                    if (rx < 0)
+                if (rx >= w)
+                {
+                    rx = w - 1;
+                }
+
+                if (lx < 0)
+                {
+                    lx = 0;
+                }
+
+                if (lx >= w)
+                {
+                    lx = w - 1;
+                }
+
+                // Draw line
+                if (noBlending)
+                {
+                    for (int i = lx; i <= rx; i++)
                     {
-                        rx = 0;
+                        pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
+                        pixels[i + lh] = color; // Quadrant III to IV
                     }
-
-                    if (rx >= w)
+                }
+                else
+                {
+                    for (int i = lx; i <= rx; i++)
                     {
-                        rx = w - 1;
-                    }
+                        // Quadrant II to I (Actually two octants)
+                        pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
 
-                    if (lx < 0)
-                    {
-                        lx = 0;
+                        // Quadrant III to IV
+                        pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
                     }
+                }
 
-                    if (lx >= w)
-                    {
-                        lx = w - 1;
-                    }
 
-                    // Draw line
-                    if (noBlending)
-                    {
-                        for (int i = lx; i <= rx; i++)
-                        {
-                            pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
-                            pixels[i + lh] = color; // Quadrant III to IV
-                        }
-                    }
-                    else
-                    {
-                        for (int i = lx; i <= rx; i++)
-                        {
-                            // Quadrant II to I (Actually two octants)
-                            pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
-
-                            // Quadrant III to IV
-                            pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
-                        }
-                    }
-
-                    x++;
-                    xStopping += yrSqTwo;
+                y++;
+                yStopping += xrSqTwo;
+                err += yChg;
+                yChg += xrSqTwo;
+                if ((xChg + (err << 1)) > 0)
+                {
+                    x--;
+                    xStopping -= yrSqTwo;
                     err += xChg;
                     xChg += yrSqTwo;
-                    if ((yChg + (err << 1)) > 0)
+                }
+            }
+
+            // ReInit vars
+            x = 0;
+            y = yr;
+
+            // Upper half
+            uy = yc + y;
+            // Lower half
+            ly = yc - y;
+
+            // Clip
+            if (uy < 0)
+            {
+                uy = 0;
+            }
+
+            if (uy >= h)
+            {
+                uy = h - 1;
+            }
+
+            if (ly < 0)
+            {
+                ly = 0;
+            }
+
+            if (ly >= h)
+            {
+                ly = h - 1;
+            }
+
+            // Upper half
+            uh = uy * w;
+            // Lower half
+            lh = ly * w;
+
+            xChg = yr * yr;
+            yChg = xr * xr * (1 - (yr << 1));
+            err = 0;
+            xStopping = 0;
+            yStopping = xrSqTwo * yr;
+
+            // Draw second set of points clockwise where tangent line slope < -1.
+            while (xStopping <= yStopping)
+            {
+                // Draw 4 quadrant points at once
+                rx = xc + x;
+                lx = xc - x;
+
+                // Clip
+                if (rx < 0)
+                {
+                    rx = 0;
+                }
+
+                if (rx >= w)
+                {
+                    rx = w - 1;
+                }
+
+                if (lx < 0)
+                {
+                    lx = 0;
+                }
+
+                if (lx >= w)
+                {
+                    lx = w - 1;
+                }
+
+                // Draw line
+                if (noBlending)
+                {
+                    for (int i = lx; i <= rx; i++)
                     {
-                        y--;
-                        uy = yc + y; // Upper half
-                        ly = yc - y; // Lower half
-                        if (uy < 0)
-                        {
-                            uy = 0; // Clip
-                        }
-
-                        if (uy >= h)
-                        {
-                            uy = h - 1; // ...
-                        }
-
-                        if (ly < 0)
-                        {
-                            ly = 0;
-                        }
-
-                        if (ly >= h)
-                        {
-                            ly = h - 1;
-                        }
-
-                        uh = uy * w; // Upper half
-                        lh = ly * w; // Lower half
-                        yStopping -= xrSqTwo;
-                        err += yChg;
-                        yChg += xrSqTwo;
+                        pixels[i + uh] = color; // Quadrant II to I (Actually two octants)
+                        pixels[i + lh] = color; // Quadrant III to IV
                     }
+                }
+                else
+                {
+                    for (int i = lx; i <= rx; i++)
+                    {
+                        // Quadrant II to I (Actually two octants)
+                        pixels[i + uh] = AlphaBlendColors(pixels[i + uh], sa, sr, sg, sb);
+
+                        // Quadrant III to IV
+                        pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
+                    }
+                }
+
+                x++;
+                xStopping += yrSqTwo;
+                err += xChg;
+                xChg += yrSqTwo;
+                if ((yChg + (err << 1)) > 0)
+                {
+                    y--;
+                    uy = yc + y; // Upper half
+                    ly = yc - y; // Lower half
+                    if (uy < 0)
+                    {
+                        uy = 0; // Clip
+                    }
+
+                    if (uy >= h)
+                    {
+                        uy = h - 1; // ...
+                    }
+
+                    if (ly < 0)
+                    {
+                        ly = 0;
+                    }
+
+                    if (ly >= h)
+                    {
+                        ly = h - 1;
+                    }
+
+                    uh = uy * w; // Upper half
+                    lh = ly * w; // Lower half
+                    yStopping -= xrSqTwo;
+                    err += yChg;
+                    yChg += xrSqTwo;
                 }
             }
         }
@@ -505,118 +501,116 @@ namespace System.Windows.Media.Imaging
         /// <param name="doAlphaBlend">True if alpha blending should be performed or false if not.</param>
         public static void FillPolygon(this WriteableBitmap bmp, int[] points, int color, bool doAlphaBlend = false)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
+
+            int sa = (color >> 24) & 0xff;
+            int sr = (color >> 16) & 0xff;
+            int sg = (color >> 8) & 0xff;
+            int sb = (color) & 0xff;
+
+            bool noBlending = !doAlphaBlend || sa == 255;
+
+            var pixels = context.Pixels;
+            int pn = points.Length;
+            int pnh = points.Length >> 1;
+            int[] intersectionsX = new int[pnh];
+
+            // Find y min and max (slightly faster than scanning from 0 to height)
+            int yMin = h;
+            int yMax = 0;
+            for (int i = 1; i < pn; i += 2)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
-
-                int sa = (color >> 24) & 0xff;
-                int sr = (color >> 16) & 0xff;
-                int sg = (color >> 8) & 0xff;
-                int sb = (color) & 0xff;
-
-                bool noBlending = !doAlphaBlend || sa == 255;
-
-                var pixels = context.Pixels;
-                int pn = points.Length;
-                int pnh = points.Length >> 1;
-                int[] intersectionsX = new int[pnh];
-
-                // Find y min and max (slightly faster than scanning from 0 to height)
-                int yMin = h;
-                int yMax = 0;
-                for (int i = 1; i < pn; i += 2)
+                int py = points[i];
+                if (py < yMin)
                 {
-                    int py = points[i];
-                    if (py < yMin)
+                    yMin = py;
+                }
+
+                if (py > yMax)
+                {
+                    yMax = py;
+                }
+            }
+            if (yMin < 0)
+            {
+                yMin = 0;
+            }
+
+            if (yMax >= h)
+            {
+                yMax = h - 1;
+            }
+
+            // Scan line from min to max
+            for (int y = yMin; y <= yMax; y++)
+            {
+                // Initial point x, y
+                float vxi = points[0];
+                float vyi = points[1];
+
+                // Find all intersections
+                // Based on http://alienryderflex.com/polygon_fill/
+                int intersectionCount = 0;
+                for (int i = 2; i < pn; i += 2)
+                {
+                    // Next point x, y
+                    float vxj = points[i];
+                    float vyj = points[i + 1];
+
+                    // Is the scanline between the two points
+                    if ((vyi < y && vyj >= y)
+                     || (vyj < y && vyi >= y))
                     {
-                        yMin = py;
+                        // Compute the intersection of the scanline with the edge (line between two points)
+                        intersectionsX[intersectionCount++] = (int)(vxi + ((y - vyi) / (vyj - vyi) * (vxj - vxi)));
                     }
+                    vxi = vxj;
+                    vyi = vyj;
+                }
 
-                    if (py > yMax)
+                // Sort the intersections from left to right using Insertion sort 
+                // It's faster than Array.Sort for this small data set
+                int t, j;
+                for (int i = 1; i < intersectionCount; i++)
+                {
+                    t = intersectionsX[i];
+                    j = i;
+                    while (j > 0 && intersectionsX[j - 1] > t)
                     {
-                        yMax = py;
+                        intersectionsX[j] = intersectionsX[j - 1];
+                        j--;
                     }
-                }
-                if (yMin < 0)
-                {
-                    yMin = 0;
+                    intersectionsX[j] = t;
                 }
 
-                if (yMax >= h)
+                // Fill the pixels between the intersections
+                for (int i = 0; i < intersectionCount - 1; i += 2)
                 {
-                    yMax = h - 1;
-                }
+                    int x0 = intersectionsX[i];
+                    int x1 = intersectionsX[i + 1];
 
-                // Scan line from min to max
-                for (int y = yMin; y <= yMax; y++)
-                {
-                    // Initial point x, y
-                    float vxi = points[0];
-                    float vyi = points[1];
-
-                    // Find all intersections
-                    // Based on http://alienryderflex.com/polygon_fill/
-                    int intersectionCount = 0;
-                    for (int i = 2; i < pn; i += 2)
+                    // Check boundary
+                    if (x1 > 0 && x0 < w)
                     {
-                        // Next point x, y
-                        float vxj = points[i];
-                        float vyj = points[i + 1];
-
-                        // Is the scanline between the two points
-                        if ((vyi < y && vyj >= y)
-                         || (vyj < y && vyi >= y))
+                        if (x0 < 0)
                         {
-                            // Compute the intersection of the scanline with the edge (line between two points)
-                            intersectionsX[intersectionCount++] = (int)(vxi + ((y - vyi) / (vyj - vyi) * (vxj - vxi)));
+                            x0 = 0;
                         }
-                        vxi = vxj;
-                        vyi = vyj;
-                    }
 
-                    // Sort the intersections from left to right using Insertion sort 
-                    // It's faster than Array.Sort for this small data set
-                    int t, j;
-                    for (int i = 1; i < intersectionCount; i++)
-                    {
-                        t = intersectionsX[i];
-                        j = i;
-                        while (j > 0 && intersectionsX[j - 1] > t)
+                        if (x1 >= w)
                         {
-                            intersectionsX[j] = intersectionsX[j - 1];
-                            j = j - 1;
+                            x1 = w - 1;
                         }
-                        intersectionsX[j] = t;
-                    }
 
-                    // Fill the pixels between the intersections
-                    for (int i = 0; i < intersectionCount - 1; i += 2)
-                    {
-                        int x0 = intersectionsX[i];
-                        int x1 = intersectionsX[i + 1];
-
-                        // Check boundary
-                        if (x1 > 0 && x0 < w)
+                        // Fill the pixels
+                        for (int x = x0; x <= x1; x++)
                         {
-                            if (x0 < 0)
-                            {
-                                x0 = 0;
-                            }
+                            int idx = (y * w) + x;
 
-                            if (x1 >= w)
-                            {
-                                x1 = w - 1;
-                            }
-
-                            // Fill the pixels
-                            for (int x = x0; x <= x1; x++)
-                            {
-                                int idx = (y * w) + x;
-
-                                pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
-                            }
+                            pixels[idx] = noBlending ? color : AlphaBlendColors(pixels[idx], sa, sr, sg, sb);
                         }
                     }
                 }
@@ -761,157 +755,155 @@ namespace System.Windows.Media.Imaging
             }
             // could use single polygon fill if count is 1, but it the algorithm used there is slower (at least for larger polygons)
 
-            using (var context = bmp.GetBitmapContext())
-            {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
-                var pixels = context.Pixels;
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
+            var pixels = context.Pixels;
 
-                // Register edges, and find y max
-                List<Edge> edges = new List<Edge>();
-                int yMax = 0;
-                foreach (int[] points in polygons)
+            // Register edges, and find y max
+            List<Edge> edges = [];
+            int yMax = 0;
+            foreach (int[] points in polygons)
+            {
+                int pn = points.Length;
+                if (pn < 6)
                 {
-                    int pn = points.Length;
-                    if (pn < 6)
+                    // sanity check: don't care for lines or points or empty polygons
+                    continue;
+                }
+                int lastX;
+                int lastY;
+                int start;
+                if (points[0] != points[pn - 2]
+                    || points[1] != points[pn - 1])
+                {
+                    start = 0;
+                    lastX = points[pn - 2];
+                    lastY = points[pn - 1];
+                }
+                else
+                {
+                    start = 2;
+                    lastX = points[0];
+                    lastY = points[1];
+                }
+                for (int i = start; i < pn; i += 2)
+                {
+                    int px = points[i];
+                    int py = points[i + 1];
+                    if (py != lastY)
                     {
-                        // sanity check: don't care for lines or points or empty polygons
+                        Edge edge = new(lastX, lastY, px, py);
+                        if (edge.StartY < h && edge.EndY >= 0)
+                        {
+                            if (edge.EndY > yMax)
+                            {
+                                yMax = edge.EndY;
+                            }
+
+                            edges.Add(edge);
+                        }
+                    }
+                    lastX = px;
+                    lastY = py;
+                }
+            }
+            if (edges.Count == 0)
+            {
+                // sanity check
+                return;
+            }
+
+            if (yMax >= h)
+            {
+                yMax = h - 1;
+            }
+
+            edges.Sort();
+            int yMin = edges[0].StartY;
+            if (yMin < 0)
+            {
+                yMin = 0;
+            }
+
+            int[] intersectionsX = new int[edges.Count];
+
+            LinkedList<Edge> currentEdges = new();
+            int e = 0;
+
+            // Scan line from min to max
+            for (int y = yMin; y <= yMax; y++)
+            {
+                // Remove edges no longer intersecting
+                LinkedListNode<Edge> node = currentEdges.First;
+                while (node != null)
+                {
+                    LinkedListNode<Edge> nextNode = node.Next;
+                    Edge edge = node.Value;
+                    if (edge.EndY <= y)
+                    {
+                        // using = here because the connecting edge will be added next
+                        // remove edge
+                        currentEdges.Remove(node);
+                    }
+                    node = nextNode;
+                }
+                // Add edges starting to intersect
+                while (e < edges.Count &&
+                       edges[e].StartY <= y)
+                {
+                    currentEdges.AddLast(edges[e]);
+                    ++e;
+                }
+                // Calculate intersections
+                int intersectionCount = 0;
+                foreach (Edge currentEdge in currentEdges)
+                {
+                    intersectionsX[intersectionCount++] =
+                        (int)(currentEdge.StartX + ((y - currentEdge.StartY) * currentEdge.Sloap));
+                }
+
+                // Sort the intersections from left to right using Insertion sort 
+                // It's faster than Array.Sort for this small data set
+                for (int i = 1; i < intersectionCount; i++)
+                {
+                    int t = intersectionsX[i];
+                    int j = i;
+                    while (j > 0 && intersectionsX[j - 1] > t)
+                    {
+                        intersectionsX[j] = intersectionsX[j - 1];
+                        j--;
+                    }
+                    intersectionsX[j] = t;
+                }
+
+                // Fill the pixels between the intersections
+                for (int i = 0; i < intersectionCount - 1; i += 2)
+                {
+                    int x0 = intersectionsX[i];
+                    int x1 = intersectionsX[i + 1];
+
+                    if (x0 < 0)
+                    {
+                        x0 = 0;
+                    }
+
+                    if (x1 >= w)
+                    {
+                        x1 = w - 1;
+                    }
+
+                    if (x1 < x0)
+                    {
                         continue;
                     }
-                    int lastX;
-                    int lastY;
-                    int start;
-                    if (points[0] != points[pn - 2]
-                        || points[1] != points[pn - 1])
+
+                    // Fill the pixels
+                    int index = (y * w) + x0;
+                    for (int x = x0; x <= x1; x++)
                     {
-                        start = 0;
-                        lastX = points[pn - 2];
-                        lastY = points[pn - 1];
-                    }
-                    else
-                    {
-                        start = 2;
-                        lastX = points[0];
-                        lastY = points[1];
-                    }
-                    for (int i = start; i < pn; i += 2)
-                    {
-                        int px = points[i];
-                        int py = points[i + 1];
-                        if (py != lastY)
-                        {
-                            Edge edge = new Edge(lastX, lastY, px, py);
-                            if (edge.StartY < h && edge.EndY >= 0)
-                            {
-                                if (edge.EndY > yMax)
-                                {
-                                    yMax = edge.EndY;
-                                }
-
-                                edges.Add(edge);
-                            }
-                        }
-                        lastX = px;
-                        lastY = py;
-                    }
-                }
-                if (edges.Count == 0)
-                {
-                    // sanity check
-                    return;
-                }
-
-                if (yMax >= h)
-                {
-                    yMax = h - 1;
-                }
-
-                edges.Sort();
-                int yMin = edges[0].StartY;
-                if (yMin < 0)
-                {
-                    yMin = 0;
-                }
-
-                int[] intersectionsX = new int[edges.Count];
-
-                LinkedList<Edge> currentEdges = new LinkedList<Edge>();
-                int e = 0;
-
-                // Scan line from min to max
-                for (int y = yMin; y <= yMax; y++)
-                {
-                    // Remove edges no longer intersecting
-                    LinkedListNode<Edge> node = currentEdges.First;
-                    while (node != null)
-                    {
-                        LinkedListNode<Edge> nextNode = node.Next;
-                        Edge edge = node.Value;
-                        if (edge.EndY <= y)
-                        {
-                            // using = here because the connecting edge will be added next
-                            // remove edge
-                            currentEdges.Remove(node);
-                        }
-                        node = nextNode;
-                    }
-                    // Add edges starting to intersect
-                    while (e < edges.Count &&
-                           edges[e].StartY <= y)
-                    {
-                        currentEdges.AddLast(edges[e]);
-                        ++e;
-                    }
-                    // Calculate intersections
-                    int intersectionCount = 0;
-                    foreach (Edge currentEdge in currentEdges)
-                    {
-                        intersectionsX[intersectionCount++] =
-                            (int)(currentEdge.StartX + ((y - currentEdge.StartY) * currentEdge.Sloap));
-                    }
-
-                    // Sort the intersections from left to right using Insertion sort 
-                    // It's faster than Array.Sort for this small data set
-                    for (int i = 1; i < intersectionCount; i++)
-                    {
-                        int t = intersectionsX[i];
-                        int j = i;
-                        while (j > 0 && intersectionsX[j - 1] > t)
-                        {
-                            intersectionsX[j] = intersectionsX[j - 1];
-                            j = j - 1;
-                        }
-                        intersectionsX[j] = t;
-                    }
-
-                    // Fill the pixels between the intersections
-                    for (int i = 0; i < intersectionCount - 1; i += 2)
-                    {
-                        int x0 = intersectionsX[i];
-                        int x1 = intersectionsX[i + 1];
-
-                        if (x0 < 0)
-                        {
-                            x0 = 0;
-                        }
-
-                        if (x1 >= w)
-                        {
-                            x1 = w - 1;
-                        }
-
-                        if (x1 < x0)
-                        {
-                            continue;
-                        }
-
-                        // Fill the pixels
-                        int index = (y * w) + x0;
-                        for (int x = x0; x <= x1; x++)
-                        {
-                            pixels[index++] = color;
-                        }
+                        pixels[index++] = color;
                     }
                 }
             }
@@ -1047,8 +1039,6 @@ namespace System.Windows.Media.Imaging
             {
                 // Init vars
                 var step = StepFactor / len;
-                int tx = x1;
-                int ty = y1;
 
                 // Interpolate
                 for (var t = 0f; t <= 1; t += step)
@@ -1057,8 +1047,8 @@ namespace System.Windows.Media.Imaging
                     var t1 = 1 - t;
                     var t1Sq = t1 * t1;
 
-                    tx = (int)((t1 * t1Sq * x1) + (3 * t * t1Sq * cx1) + (3 * t1 * tSq * cx2) + (t * tSq * x2));
-                    ty = (int)((t1 * t1Sq * y1) + (3 * t * t1Sq * cy1) + (3 * t1 * tSq * cy2) + (t * tSq * y2));
+                    int tx = (int)((t1 * t1Sq * x1) + (3 * t * t1Sq * cx1) + (3 * t1 * tSq * cx2) + (t * tSq * x2));
+                    int ty = (int)((t1 * t1Sq * y1) + (3 * t * t1Sq * cy1) + (3 * t1 * tSq * cy2) + (t * tSq * y2));
 
                     list.Add(tx);
                     list.Add(ty);

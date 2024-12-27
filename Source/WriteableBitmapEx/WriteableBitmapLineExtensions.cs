@@ -50,109 +50,107 @@ namespace System.Windows.Media.Imaging
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLineBresenham(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
+            var pixels = context.Pixels;
+
+            // Get clip coordinates
+            int clipX1 = 0;
+            int clipX2 = w;
+            int clipY1 = 0;
+            int clipY2 = h;
+            if (clipRect.HasValue)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
-                var pixels = context.Pixels;
+                var c = clipRect.Value;
+                clipX1 = (int)c.X;
+                clipX2 = (int)(c.X + c.Width);
+                clipY1 = (int)c.Y;
+                clipY2 = (int)(c.Y + c.Height);
+            }
 
-                // Get clip coordinates
-                int clipX1 = 0;
-                int clipX2 = w;
-                int clipY1 = 0;
-                int clipY2 = h;
-                if (clipRect.HasValue)
-                {
-                    var c = clipRect.Value;
-                    clipX1 = (int)c.X;
-                    clipX2 = (int)(c.X + c.Width);
-                    clipY1 = (int)c.Y;
-                    clipY2 = (int)(c.Y + c.Height);
-                }
+            // Distance start and end point
+            int dx = x2 - x1;
+            int dy = y2 - y1;
 
-                // Distance start and end point
-                int dx = x2 - x1;
-                int dy = y2 - y1;
+            // Determine sign for direction x
+            int incx = 0;
+            if (dx < 0)
+            {
+                dx = -dx;
+                incx = -1;
+            }
+            else if (dx > 0)
+            {
+                incx = 1;
+            }
 
-                // Determine sign for direction x
-                int incx = 0;
-                if (dx < 0)
-                {
-                    dx = -dx;
-                    incx = -1;
-                }
-                else if (dx > 0)
-                {
-                    incx = 1;
-                }
+            // Determine sign for direction y
+            int incy = 0;
+            if (dy < 0)
+            {
+                dy = -dy;
+                incy = -1;
+            }
+            else if (dy > 0)
+            {
+                incy = 1;
+            }
 
-                // Determine sign for direction y
-                int incy = 0;
-                if (dy < 0)
-                {
-                    dy = -dy;
-                    incy = -1;
-                }
-                else if (dy > 0)
-                {
-                    incy = 1;
-                }
+            // Which gradient is larger
+            int pdx, pdy, odx, ody, es, el;
+            if (dx > dy)
+            {
+                pdx = incx;
+                pdy = 0;
+                odx = incx;
+                ody = incy;
+                es = dy;
+                el = dx;
+            }
+            else
+            {
+                pdx = 0;
+                pdy = incy;
+                odx = incx;
+                ody = incy;
+                es = dx;
+                el = dy;
+            }
 
-                // Which gradient is larger
-                int pdx, pdy, odx, ody, es, el;
-                if (dx > dy)
+            // Init start
+            int x = x1;
+            int y = y1;
+            int error = el >> 1;
+            if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
+            {
+                pixels[(y * w) + x] = color;
+            }
+
+            // Walk the line!
+            for (int i = 0; i < el; i++)
+            {
+                // Update error term
+                error -= es;
+
+                // Decide which coord to use
+                if (error < 0)
                 {
-                    pdx = incx;
-                    pdy = 0;
-                    odx = incx;
-                    ody = incy;
-                    es = dy;
-                    el = dx;
+                    error += el;
+                    x += odx;
+                    y += ody;
                 }
                 else
                 {
-                    pdx = 0;
-                    pdy = incy;
-                    odx = incx;
-                    ody = incy;
-                    es = dx;
-                    el = dy;
+                    x += pdx;
+                    y += pdy;
                 }
 
-                // Init start
-                int x = x1;
-                int y = y1;
-                int error = el >> 1;
+                // Set pixel
                 if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
                 {
                     pixels[(y * w) + x] = color;
-                }
-
-                // Walk the line!
-                for (int i = 0; i < el; i++)
-                {
-                    // Update error term
-                    error -= es;
-
-                    // Decide which coord to use
-                    if (error < 0)
-                    {
-                        error += el;
-                        x += odx;
-                        y += ody;
-                    }
-                    else
-                    {
-                        x += pdx;
-                        y += pdy;
-                    }
-
-                    // Set pixel
-                    if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
-                    {
-                        pixels[(y * w) + x] = color;
-                    }
                 }
             }
         }
@@ -185,58 +183,56 @@ namespace System.Windows.Media.Imaging
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLineDDA(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
+            var pixels = context.Pixels;
+
+            // Get clip coordinates
+            int clipX1 = 0;
+            int clipX2 = w;
+            int clipY1 = 0;
+            int clipY2 = h;
+            if (clipRect.HasValue)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
-                var pixels = context.Pixels;
+                var c = clipRect.Value;
+                clipX1 = (int)c.X;
+                clipX2 = (int)(c.X + c.Width);
+                clipY1 = (int)c.Y;
+                clipY2 = (int)(c.Y + c.Height);
+            }
 
-                // Get clip coordinates
-                int clipX1 = 0;
-                int clipX2 = w;
-                int clipY1 = 0;
-                int clipY2 = h;
-                if (clipRect.HasValue)
+            // Distance start and end point
+            int dx = x2 - x1;
+            int dy = y2 - y1;
+
+            // Determine slope (absolute value)
+            int len = dy >= 0 ? dy : -dy;
+            int lenx = dx >= 0 ? dx : -dx;
+            if (lenx > len)
+            {
+                len = lenx;
+            }
+
+            // Prevent division by zero
+            if (len != 0)
+            {
+                // Init steps and start
+                float incx = dx / (float)len;
+                float incy = dy / (float)len;
+                float x = x1;
+                float y = y1;
+
+                // Walk the line!
+                for (int i = 0; i < len; i++)
                 {
-                    var c = clipRect.Value;
-                    clipX1 = (int)c.X;
-                    clipX2 = (int)(c.X + c.Width);
-                    clipY1 = (int)c.Y;
-                    clipY2 = (int)(c.Y + c.Height);
-                }
-
-                // Distance start and end point
-                int dx = x2 - x1;
-                int dy = y2 - y1;
-
-                // Determine slope (absolute value)
-                int len = dy >= 0 ? dy : -dy;
-                int lenx = dx >= 0 ? dx : -dx;
-                if (lenx > len)
-                {
-                    len = lenx;
-                }
-
-                // Prevent division by zero
-                if (len != 0)
-                {
-                    // Init steps and start
-                    float incx = dx / (float)len;
-                    float incy = dy / (float)len;
-                    float x = x1;
-                    float y = y1;
-
-                    // Walk the line!
-                    for (int i = 0; i < len; i++)
+                    if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
                     {
-                        if (y < clipY2 && y >= clipY1 && x < clipX2 && x >= clipX1)
-                        {
-                            pixels[((int)y * w) + (int)x] = color;
-                        }
-                        x += incx;
-                        y += incy;
+                        pixels[((int)y * w) + (int)x] = color;
                     }
+                    x += incx;
+                    y += incy;
                 }
             }
         }
@@ -269,10 +265,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLine(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                DrawLine(context, context.Width, context.Height, x1, y1, x2, y2, color, clipRect);
-            }
+            using var context = bmp.GetBitmapContext();
+            DrawLine(context, context.Width, context.Height, x1, y1, x2, y2, color, clipRect);
         }
 
         /// <summary>
@@ -319,25 +313,8 @@ namespace System.Windows.Media.Imaging
             const int PRECISION_SHIFT = 8;
 
             // Determine slope (absolute value)
-            int lenX, lenY;
-            if (dy >= 0)
-            {
-                lenY = dy;
-            }
-            else
-            {
-                lenY = -dy;
-            }
-
-            if (dx >= 0)
-            {
-                lenX = dx;
-            }
-            else
-            {
-                lenX = -dx;
-            }
-
+            int lenX = dx >= 0 ? dx : -dx;
+            int lenY = dy >= 0 ? dy : -dy;
             if (lenX > lenY)
             { // x increases by +/- 1
                 if (dx < 0)
@@ -577,13 +554,9 @@ namespace System.Windows.Media.Imaging
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLinePenned(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, WriteableBitmap penBmp, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                using (var penContext = penBmp.GetBitmapContext(ReadWriteMode.ReadOnly))
-                {
-                    DrawLinePenned(context, context.Width, context.Height, x1, y1, x2, y2, penContext, clipRect);
-                }
-            }
+            using var context = bmp.GetBitmapContext();
+            using var penContext = penBmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            DrawLinePenned(context, context.Width, context.Height, x1, y1, x2, y2, penContext, clipRect);
         }
 
         /// <summary>
@@ -799,23 +772,21 @@ namespace System.Windows.Media.Imaging
             // vertically and horizontally checks by themselves if coords are out of bounds, otherwise CohenSutherlandCLip is used
 
             // vertically?
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            if (x1 == x2)
             {
-                if (x1 == x2)
-                {
-                    SwapHorV(ref y1, ref y2);
-                    DrawVertically(context, x1, y1, y2, dotSpace, dotLength, color);
-                }
-                // horizontally?
-                else if (y1 == y2)
-                {
-                    SwapHorV(ref x1, ref x2);
-                    DrawHorizontally(context, x1, x2, y1, dotSpace, dotLength, color);
-                }
-                else
-                {
-                    Draw(context, x1, y1, x2, y2, dotSpace, dotLength, color);
-                }
+                SwapHorV(ref y1, ref y2);
+                DrawVertically(context, x1, y1, y2, dotSpace, dotLength, color);
+            }
+            // horizontally?
+            else if (y1 == y2)
+            {
+                SwapHorV(ref x1, ref x2);
+                DrawHorizontally(context, x1, x2, y1, dotSpace, dotLength, color);
+            }
+            else
+            {
+                Draw(context, x1, y1, x2, y2, dotSpace, dotLength, color);
             }
         }
 
@@ -1011,10 +982,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
         public static void DrawLineWu(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int sa, int sr, int sg, int sb, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                DrawLineWu(context, context.Width, context.Height, x1, y1, x2, y2, sa, sr, sg, sb, clipRect);
-            }
+            using var context = bmp.GetBitmapContext();
+            DrawLineWu(context, context.Width, context.Height, x1, y1, x2, y2, sa, sr, sg, sb, clipRect);
         }
 
         /// <summary>
@@ -1220,10 +1189,8 @@ namespace System.Windows.Media.Imaging
         /// </summary>
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, int strokeThickness, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, color, clipRect);
-            }
+            using var context = bmp.GetBitmapContext();
+            AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, color, clipRect);
         }
 
         /// <summary> 
@@ -1259,10 +1226,8 @@ namespace System.Windows.Media.Imaging
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, Color color, int strokeThickness, Rect? clipRect = null)
         {
             var col = ConvertColor(color);
-            using (var context = bmp.GetBitmapContext())
-            {
-                AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, col, clipRect);
-            }
+            using var context = bmp.GetBitmapContext();
+            AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, col, clipRect);
         }
 
         /// <summary> 
@@ -1295,10 +1260,8 @@ namespace System.Windows.Media.Imaging
         /// </summary> 
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                DrawLineAa(context, context.Width, context.Height, x1, y1, x2, y2, color, clipRect);
-            }
+            using var context = bmp.GetBitmapContext();
+            DrawLineAa(context, context.Width, context.Height, x1, y1, x2, y2, color, clipRect);
         }
 
         /// <summary> 
@@ -1539,17 +1502,7 @@ namespace System.Windows.Media.Imaging
 
         private static float ClipToInt(float d)
         {
-            if (d > int.MaxValue)
-            {
-                return int.MaxValue;
-            }
-
-            if (d < int.MinValue)
-            {
-                return int.MinValue;
-            }
-
-            return d;
+            return d > int.MaxValue ? int.MaxValue : d < int.MinValue ? int.MinValue : d;
         }
 
         internal static bool CohenSutherlandLineClip(Rect extents, ref int xi0, ref int yi0, ref int xi1, ref int yi1)

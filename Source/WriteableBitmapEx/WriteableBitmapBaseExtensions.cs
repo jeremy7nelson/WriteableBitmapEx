@@ -35,7 +35,7 @@ namespace System.Windows.Media.Imaging
 
         public static int ConvertColor(double opacity, Color color)
         {
-            if (opacity < 0.0 || opacity > 1.0)
+            if (opacity is < 0.0 or > 1.0)
             {
                 throw new ArgumentOutOfRangeException(nameof(opacity), "Opacity must be between 0.0 and 1.0");
             }
@@ -69,28 +69,26 @@ namespace System.Windows.Media.Imaging
         public static void Clear(this WriteableBitmap bmp, Color color)
         {
             var col = ConvertColor(color);
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            var pixels = context.Pixels;
+            var w = context.Width;
+            var h = context.Height;
+            var len = w * SizeOfArgb;
+
+            // Fill first line
+            for (var x = 0; x < w; x++)
             {
-                var pixels = context.Pixels;
-                var w = context.Width;
-                var h = context.Height;
-                var len = w * SizeOfArgb;
+                pixels[x] = col;
+            }
 
-                // Fill first line
-                for (var x = 0; x < w; x++)
-                {
-                    pixels[x] = col;
-                }
-
-                // Copy first line
-                var blockHeight = 1;
-                var y = 1;
-                while (y < h)
-                {
-                    BitmapContext.BlockCopy(context, 0, context, y * len, blockHeight * len);
-                    y += blockHeight;
-                    blockHeight = Math.Min(2 * blockHeight, h - y);
-                }
+            // Copy first line
+            var blockHeight = 1;
+            var y = 1;
+            while (y < h)
+            {
+                BitmapContext.BlockCopy(context, 0, context, y * len, blockHeight * len);
+                y += blockHeight;
+                blockHeight = Math.Min(2 * blockHeight, h - y);
             }
         }
 
@@ -100,10 +98,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="bmp">The WriteableBitmap.</param>
         public static void Clear(this WriteableBitmap bmp)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Clear();
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Clear();
         }
 
         /// <summary>
@@ -113,15 +109,13 @@ namespace System.Windows.Media.Imaging
         /// <returns>A copy of the WriteableBitmap.</returns>
         public static WriteableBitmap Clone(this WriteableBitmap bmp)
         {
-            using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var result = BitmapFactory.New(srcContext.Width, srcContext.Height);
+            using (var destContext = result.GetBitmapContext())
             {
-                var result = BitmapFactory.New(srcContext.Width, srcContext.Height);
-                using (var destContext = result.GetBitmapContext())
-                {
-                    BitmapContext.BlockCopy(srcContext, 0, destContext, 0, srcContext.Length * SizeOfArgb);
-                }
-                return result;
+                BitmapContext.BlockCopy(srcContext, 0, destContext, 0, srcContext.Length * SizeOfArgb);
             }
+            return result;
         }
 
         #endregion
@@ -136,20 +130,18 @@ namespace System.Windows.Media.Imaging
         /// <param name="func">The function to apply. With parameters x, y and a color as a result</param>
         public static void ForEach(this WriteableBitmap bmp, Func<int, int, Color> func)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                var pixels = context.Pixels;
-                int w = context.Width;
-                int h = context.Height;
-                int index = 0;
+            using var context = bmp.GetBitmapContext();
+            var pixels = context.Pixels;
+            int w = context.Width;
+            int h = context.Height;
+            int index = 0;
 
-                for (int y = 0; y < h; y++)
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
                 {
-                    for (int x = 0; x < w; x++)
-                    {
-                        var color = func(x, y);
-                        pixels[index++] = ConvertColor(color);
-                    }
+                    var color = func(x, y);
+                    pixels[index++] = ConvertColor(color);
                 }
             }
         }
@@ -162,37 +154,35 @@ namespace System.Windows.Media.Imaging
         /// <param name="func">The function to apply. With parameters x, y, source color and a color as a result</param>
         public static void ForEach(this WriteableBitmap bmp, Func<int, int, Color, Color> func)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            var pixels = context.Pixels;
+            var w = context.Width;
+            var h = context.Height;
+            var index = 0;
+
+            for (var y = 0; y < h; y++)
             {
-                var pixels = context.Pixels;
-                var w = context.Width;
-                var h = context.Height;
-                var index = 0;
-
-                for (var y = 0; y < h; y++)
+                for (var x = 0; x < w; x++)
                 {
-                    for (var x = 0; x < w; x++)
+                    var c = pixels[index];
+
+                    // Premultiplied Alpha!
+                    var a = (byte)(c >> 24);
+                    // Prevent division by zero
+                    int ai = a;
+                    if (ai == 0)
                     {
-                        var c = pixels[index];
-
-                        // Premultiplied Alpha!
-                        var a = (byte)(c >> 24);
-                        // Prevent division by zero
-                        int ai = a;
-                        if (ai == 0)
-                        {
-                            ai = 1;
-                        }
-                        // Scale inverse alpha to use cheap integer mul bit shift
-                        ai = (255 << 8) / ai;
-                        var srcColor = Color.FromArgb(a,
-                                                      (byte)((((c >> 16) & 0xFF) * ai) >> 8),
-                                                      (byte)((((c >> 8) & 0xFF) * ai) >> 8),
-                                                      (byte)(((c & 0xFF) * ai) >> 8));
-
-                        var color = func(x, y, srcColor);
-                        pixels[index++] = ConvertColor(color);
+                        ai = 1;
                     }
+                    // Scale inverse alpha to use cheap integer mul bit shift
+                    ai = (255 << 8) / ai;
+                    var srcColor = Color.FromArgb(a,
+                                                  (byte)((((c >> 16) & 0xFF) * ai) >> 8),
+                                                  (byte)((((c >> 8) & 0xFF) * ai) >> 8),
+                                                  (byte)(((c & 0xFF) * ai) >> 8));
+
+                    var color = func(x, y, srcColor);
+                    pixels[index++] = ConvertColor(color);
                 }
             }
         }
@@ -211,10 +201,8 @@ namespace System.Windows.Media.Imaging
         /// <returns>The color of the pixel at x, y.</returns>
         public static int GetPixeli(this WriteableBitmap bmp, int x, int y)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
-            {
-                return context.Pixels[(y * context.Width) + x];
-            }
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            return context.Pixels[(y * context.Width) + x];
         }
 
         /// <summary>
@@ -227,25 +215,23 @@ namespace System.Windows.Media.Imaging
         /// <returns>The color of the pixel at x, y as a Color struct.</returns>
         public static Color GetPixel(this WriteableBitmap bmp, int x, int y)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var c = context.Pixels[(y * context.Width) + x];
+            var a = (byte)(c >> 24);
+
+            // Prevent division by zero
+            int ai = a;
+            if (ai == 0)
             {
-                var c = context.Pixels[(y * context.Width) + x];
-                var a = (byte)(c >> 24);
-
-                // Prevent division by zero
-                int ai = a;
-                if (ai == 0)
-                {
-                    ai = 1;
-                }
-
-                // Scale inverse alpha to use cheap integer mul bit shift
-                ai = (255 << 8) / ai;
-                return Color.FromArgb(a,
-                                     (byte)((((c >> 16) & 0xFF) * ai) >> 8),
-                                     (byte)((((c >> 8) & 0xFF) * ai) >> 8),
-                                     (byte)(((c & 0xFF) * ai) >> 8));
+                ai = 1;
             }
+
+            // Scale inverse alpha to use cheap integer mul bit shift
+            ai = (255 << 8) / ai;
+            return Color.FromArgb(a,
+                                 (byte)((((c >> 16) & 0xFF) * ai) >> 8),
+                                 (byte)((((c >> 8) & 0xFF) * ai) >> 8),
+                                 (byte)(((c & 0xFF) * ai) >> 8));
         }
 
         /// <summary>
@@ -257,17 +243,15 @@ namespace System.Windows.Media.Imaging
         /// <returns>The brightness of the pixel at x, y.</returns>
         public static byte GetBrightness(this WriteableBitmap bmp, int x, int y)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
-            {
-                // Extract color components
-                var c = context.Pixels[(y * context.Width) + x];
-                var r = (byte)(c >> 16);
-                var g = (byte)(c >> 8);
-                var b = (byte)c;
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            // Extract color components
+            var c = context.Pixels[(y * context.Width) + x];
+            var r = (byte)(c >> 16);
+            var g = (byte)(c >> 8);
+            var b = (byte)c;
 
-                // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                return (byte)(((r * 6966) + (g * 23436) + (b * 2366)) >> 15);
-            }
+            // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
+            return (byte)(((r * 6966) + (g * 23436) + (b * 2366)) >> 15);
         }
 
         #endregion
@@ -287,10 +271,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="b">The blue value of the color.</param>
         public static void SetPixeli(this WriteableBitmap bmp, int index, byte r, byte g, byte b)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[index] = (255 << 24) | (r << 16) | (g << 8) | b;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[index] = (255 << 24) | (r << 16) | (g << 8) | b;
         }
 
         /// <summary>
@@ -305,10 +287,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="b">The blue value of the color.</param>
         public static void SetPixel(this WriteableBitmap bmp, int x, int y, byte r, byte g, byte b)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[(y * context.Width) + x] = (255 << 24) | (r << 16) | (g << 8) | b;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[(y * context.Width) + x] = (255 << 24) | (r << 16) | (g << 8) | b;
         }
 
         #endregion
@@ -327,10 +307,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="b">The blue value of the color.</param>
         public static void SetPixeli(this WriteableBitmap bmp, int index, byte a, byte r, byte g, byte b)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[index] = (a << 24) | (r << 16) | (g << 8) | b;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[index] = (a << 24) | (r << 16) | (g << 8) | b;
         }
 
         /// <summary>
@@ -346,10 +324,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="b">The blue value of the color.</param>
         public static void SetPixel(this WriteableBitmap bmp, int x, int y, byte a, byte r, byte g, byte b)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[(y * context.Width) + x] = (a << 24) | (r << 16) | (g << 8) | b;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[(y * context.Width) + x] = (a << 24) | (r << 16) | (g << 8) | b;
         }
 
         #endregion
@@ -365,10 +341,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixeli(this WriteableBitmap bmp, int index, Color color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[index] = ConvertColor(color);
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[index] = ConvertColor(color);
         }
 
         /// <summary>
@@ -381,10 +355,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixel(this WriteableBitmap bmp, int x, int y, Color color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[(y * context.Width) + x] = ConvertColor(color);
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[(y * context.Width) + x] = ConvertColor(color);
         }
 
         /// <summary>
@@ -397,15 +369,13 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixeli(this WriteableBitmap bmp, int index, byte a, Color color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                // Add one to use mul and cheap bit shift for multiplicaltion
-                var ai = a + 1;
-                context.Pixels[index] = (a << 24)
-                           | ((byte)((color.R * ai) >> 8) << 16)
-                           | ((byte)((color.G * ai) >> 8) << 8)
-                           | ((byte)((color.B * ai) >> 8));
-            }
+            using var context = bmp.GetBitmapContext();
+            // Add one to use mul and cheap bit shift for multiplicaltion
+            var ai = a + 1;
+            context.Pixels[index] = (a << 24)
+                       | ((byte)((color.R * ai) >> 8) << 16)
+                       | ((byte)((color.G * ai) >> 8) << 8)
+                       | ((byte)((color.B * ai) >> 8));
         }
 
         /// <summary>
@@ -419,15 +389,13 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixel(this WriteableBitmap bmp, int x, int y, byte a, Color color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                // Add one to use mul and cheap bit shift for multiplicaltion
-                var ai = a + 1;
-                context.Pixels[(y * context.Width) + x] = (a << 24)
-                                             | ((byte)((color.R * ai) >> 8) << 16)
-                                             | ((byte)((color.G * ai) >> 8) << 8)
-                                             | ((byte)((color.B * ai) >> 8));
-            }
+            using var context = bmp.GetBitmapContext();
+            // Add one to use mul and cheap bit shift for multiplicaltion
+            var ai = a + 1;
+            context.Pixels[(y * context.Width) + x] = (a << 24)
+                                         | ((byte)((color.R * ai) >> 8) << 16)
+                                         | ((byte)((color.G * ai) >> 8) << 8)
+                                         | ((byte)((color.B * ai) >> 8));
         }
 
         /// <summary>
@@ -439,10 +407,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixeli(this WriteableBitmap bmp, int index, int color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[index] = color;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[index] = color;
         }
 
         /// <summary>
@@ -455,10 +421,8 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void SetPixel(this WriteableBitmap bmp, int x, int y, int color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                context.Pixels[(y * context.Width) + x] = color;
-            }
+            using var context = bmp.GetBitmapContext();
+            context.Pixels[(y * context.Width) + x] = color;
         }
 
         #endregion

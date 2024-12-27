@@ -88,10 +88,8 @@ namespace System.Windows.Media.Imaging
         /// <returns>A new WriteableBitmap containing the pixel data.</returns>
         public static WriteableBitmap FromContent(string relativePath)
         {
-            using (var bmpStream = Application.GetResourceStream(new Uri(relativePath, UriKind.Relative)).Stream)
-            {
-                return FromStream(bmpStream);
-            }
+            using var bmpStream = Application.GetResourceStream(new Uri(relativePath, UriKind.Relative)).Stream;
+            return FromStream(bmpStream);
         }
 
         /// <summary>

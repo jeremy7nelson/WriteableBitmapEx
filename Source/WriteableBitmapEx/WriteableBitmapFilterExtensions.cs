@@ -98,81 +98,77 @@ namespace System.Windows.Media.Imaging
                 throw new InvalidOperationException("Kernel height must be odd!");
             }
 
-            using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var w = srcContext.Width;
+            var h = srcContext.Height;
+            var result = BitmapFactory.New(w, h);
+
+            using var resultContext = result.GetBitmapContext();
+            var pixels = srcContext.Pixels;
+            var resultPixels = resultContext.Pixels;
+            var index = 0;
+            var kwh = kw >> 1;
+            var khh = kh >> 1;
+
+            for (var y = 0; y < h; y++)
             {
-                var w = srcContext.Width;
-                var h = srcContext.Height;
-                var result = BitmapFactory.New(w, h);
-
-                using (var resultContext = result.GetBitmapContext())
+                for (var x = 0; x < w; x++)
                 {
-                    var pixels = srcContext.Pixels;
-                    var resultPixels = resultContext.Pixels;
-                    var index = 0;
-                    var kwh = kw >> 1;
-                    var khh = kh >> 1;
+                    var a = 0;
+                    var r = 0;
+                    var g = 0;
+                    var b = 0;
 
-                    for (var y = 0; y < h; y++)
+                    for (var kx = -kwh; kx <= kwh; kx++)
                     {
-                        for (var x = 0; x < w; x++)
+                        var px = kx + x;
+                        // Repeat pixels at borders
+                        if (px < 0)
                         {
-                            var a = 0;
-                            var r = 0;
-                            var g = 0;
-                            var b = 0;
+                            px = 0;
+                        }
+                        else if (px >= w)
+                        {
+                            px = w - 1;
+                        }
 
-                            for (var kx = -kwh; kx <= kwh; kx++)
+                        for (var ky = -khh; ky <= khh; ky++)
+                        {
+                            var py = ky + y;
+                            // Repeat pixels at borders
+                            if (py < 0)
                             {
-                                var px = kx + x;
-                                // Repeat pixels at borders
-                                if (px < 0)
-                                {
-                                    px = 0;
-                                }
-                                else if (px >= w)
-                                {
-                                    px = w - 1;
-                                }
-
-                                for (var ky = -khh; ky <= khh; ky++)
-                                {
-                                    var py = ky + y;
-                                    // Repeat pixels at borders
-                                    if (py < 0)
-                                    {
-                                        py = 0;
-                                    }
-                                    else if (py >= h)
-                                    {
-                                        py = h - 1;
-                                    }
-
-                                    var col = pixels[(py * w) + px];
-                                    var k = kernel[ky + kwh, kx + khh];
-                                    a += ((col >> 24) & 0x000000FF) * k;
-                                    r += ((col >> 16) & 0x000000FF) * k;
-                                    g += ((col >> 8) & 0x000000FF) * k;
-                                    b += ((col) & 0x000000FF) * k;
-                                }
+                                py = 0;
+                            }
+                            else if (py >= h)
+                            {
+                                py = h - 1;
                             }
 
-                            var ta = (a / kernelFactorSum) + kernelOffsetSum;
-                            var tr = (r / kernelFactorSum) + kernelOffsetSum;
-                            var tg = (g / kernelFactorSum) + kernelOffsetSum;
-                            var tb = (b / kernelFactorSum) + kernelOffsetSum;
-
-                            // Clamp to byte boundaries
-                            var ba = (byte)((ta > 255) ? 255 : ((ta < 0) ? 0 : ta));
-                            var br = (byte)((tr > 255) ? 255 : ((tr < 0) ? 0 : tr));
-                            var bg = (byte)((tg > 255) ? 255 : ((tg < 0) ? 0 : tg));
-                            var bb = (byte)((tb > 255) ? 255 : ((tb < 0) ? 0 : tb));
-
-                            resultPixels[index++] = (ba << 24) | (br << 16) | (bg << 8) | (bb);
+                            var col = pixels[(py * w) + px];
+                            var k = kernel[ky + kwh, kx + khh];
+                            a += ((col >> 24) & 0x000000FF) * k;
+                            r += ((col >> 16) & 0x000000FF) * k;
+                            g += ((col >> 8) & 0x000000FF) * k;
+                            b += ((col) & 0x000000FF) * k;
                         }
                     }
-                    return result;
+
+                    var ta = (a / kernelFactorSum) + kernelOffsetSum;
+                    var tr = (r / kernelFactorSum) + kernelOffsetSum;
+                    var tg = (g / kernelFactorSum) + kernelOffsetSum;
+                    var tb = (b / kernelFactorSum) + kernelOffsetSum;
+
+                    // Clamp to byte boundaries
+                    var ba = (byte)((ta > 255) ? 255 : ((ta < 0) ? 0 : ta));
+                    var br = (byte)((tr > 255) ? 255 : ((tr < 0) ? 0 : tr));
+                    var bg = (byte)((tg > 255) ? 255 : ((tg < 0) ? 0 : tg));
+                    var bb = (byte)((tb > 255) ? 255 : ((tb < 0) ? 0 : tb));
+
+                    resultPixels[index++] = (ba << 24) | (br << 16) | (bg << 8) | (bb);
                 }
             }
+            return result;
         }
 
         #endregion
@@ -186,36 +182,32 @@ namespace System.Windows.Media.Imaging
         /// <returns>The new inverted WriteableBitmap.</returns>
         public static WriteableBitmap Invert(this WriteableBitmap bmp)
         {
-            using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var result = BitmapFactory.New(srcContext.Width, srcContext.Height);
+            using var resultContext = result.GetBitmapContext();
+            var rp = resultContext.Pixels;
+            var p = srcContext.Pixels;
+            var length = srcContext.Length;
+
+            for (var i = 0; i < length; i++)
             {
-                var result = BitmapFactory.New(srcContext.Width, srcContext.Height);
-                using (var resultContext = result.GetBitmapContext())
-                {
-                    var rp = resultContext.Pixels;
-                    var p = srcContext.Pixels;
-                    var length = srcContext.Length;
+                // Extract
+                var c = p[i];
+                var a = (c >> 24) & 0x000000FF;
+                var r = (c >> 16) & 0x000000FF;
+                var g = (c >> 8) & 0x000000FF;
+                var b = (c) & 0x000000FF;
 
-                    for (var i = 0; i < length; i++)
-                    {
-                        // Extract
-                        var c = p[i];
-                        var a = (c >> 24) & 0x000000FF;
-                        var r = (c >> 16) & 0x000000FF;
-                        var g = (c >> 8) & 0x000000FF;
-                        var b = (c) & 0x000000FF;
+                // Invert
+                r = 255 - r;
+                g = 255 - g;
+                b = 255 - b;
 
-                        // Invert
-                        r = 255 - r;
-                        g = 255 - g;
-                        b = 255 - b;
-
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                    }
-
-                    return result;
-                }
+                // Set
+                rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
             }
+
+            return result;
         }
 
         #endregion
@@ -229,37 +221,35 @@ namespace System.Windows.Media.Imaging
         /// <returns>The new gray WriteableBitmap.</returns>
         public static WriteableBitmap Gray(this WriteableBitmap bmp)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var nWidth = context.Width;
+            var nHeight = context.Height;
+            var px = context.Pixels;
+            var result = BitmapFactory.New(nWidth, nHeight);
+
+            using (var dest = result.GetBitmapContext())
             {
-                var nWidth = context.Width;
-                var nHeight = context.Height;
-                var px = context.Pixels;
-                var result = BitmapFactory.New(nWidth, nHeight);
-
-                using (var dest = result.GetBitmapContext())
+                var rp = dest.Pixels;
+                var len = context.Length;
+                for (var i = 0; i < len; i++)
                 {
-                    var rp = dest.Pixels;
-                    var len = context.Length;
-                    for (var i = 0; i < len; i++)
-                    {
-                        // Extract
-                        var c = px[i];
-                        var a = (c >> 24) & 0x000000FF;
-                        var r = (c >> 16) & 0x000000FF;
-                        var g = (c >> 8) & 0x000000FF;
-                        var b = (c) & 0x000000FF;
+                    // Extract
+                    var c = px[i];
+                    var a = (c >> 24) & 0x000000FF;
+                    var r = (c >> 16) & 0x000000FF;
+                    var g = (c >> 8) & 0x000000FF;
+                    var b = (c) & 0x000000FF;
 
-                        // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
-                        var gray = ((r * 6966) + (g * 23436) + (b * 2366)) >> 15;
-                        r = g = b = gray;
+                    // Convert to gray with constant factors 0.2126, 0.7152, 0.0722
+                    var gray = ((r * 6966) + (g * 23436) + (b * 2366)) >> 15;
+                    r = g = b = gray;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                    }
+                    // Set
+                    rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         /// <summary>
@@ -272,43 +262,41 @@ namespace System.Windows.Media.Imaging
         {
             var factor = (int)(259.0 * (level + 255.0) / (255.0 * (259.0 - level)) * 255.0);
 
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var nWidth = context.Width;
+            var nHeight = context.Height;
+            var px = context.Pixels;
+            var result = BitmapFactory.New(nWidth, nHeight);
+
+            using (var dest = result.GetBitmapContext())
             {
-                var nWidth = context.Width;
-                var nHeight = context.Height;
-                var px = context.Pixels;
-                var result = BitmapFactory.New(nWidth, nHeight);
-
-                using (var dest = result.GetBitmapContext())
+                var rp = dest.Pixels;
+                var len = context.Length;
+                for (var i = 0; i < len; i++)
                 {
-                    var rp = dest.Pixels;
-                    var len = context.Length;
-                    for (var i = 0; i < len; i++)
-                    {
-                        // Extract
-                        var c = px[i];
-                        var a = (c >> 24) & 0x000000FF;
-                        var r = (c >> 16) & 0x000000FF;
-                        var g = (c >> 8) & 0x000000FF;
-                        var b = (c) & 0x000000FF;
+                    // Extract
+                    var c = px[i];
+                    var a = (c >> 24) & 0x000000FF;
+                    var r = (c >> 16) & 0x000000FF;
+                    var g = (c >> 8) & 0x000000FF;
+                    var b = (c) & 0x000000FF;
 
-                        // Adjust contrast based on computed factor
-                        r = ((factor * (r - 128)) >> 8) + 128;
-                        g = ((factor * (g - 128)) >> 8) + 128;
-                        b = ((factor * (b - 128)) >> 8) + 128;
+                    // Adjust contrast based on computed factor
+                    r = ((factor * (r - 128)) >> 8) + 128;
+                    g = ((factor * (g - 128)) >> 8) + 128;
+                    b = ((factor * (b - 128)) >> 8) + 128;
 
-                        // Clamp
-                        r = r < 0 ? 0 : r > 255 ? 255 : r;
-                        g = g < 0 ? 0 : g > 255 ? 255 : g;
-                        b = b < 0 ? 0 : b > 255 ? 255 : b;
+                    // Clamp
+                    r = r < 0 ? 0 : r > 255 ? 255 : r;
+                    g = g < 0 ? 0 : g > 255 ? 255 : g;
+                    b = b < 0 ? 0 : b > 255 ? 255 : b;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                    }
+                    // Set
+                    rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         /// <summary>
@@ -319,43 +307,41 @@ namespace System.Windows.Media.Imaging
         /// <returns>The new WriteableBitmap.</returns>
         public static WriteableBitmap AdjustBrightness(this WriteableBitmap bmp, int nLevel)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var nWidth = context.Width;
+            var nHeight = context.Height;
+            var px = context.Pixels;
+            var result = BitmapFactory.New(nWidth, nHeight);
+
+            using (var dest = result.GetBitmapContext())
             {
-                var nWidth = context.Width;
-                var nHeight = context.Height;
-                var px = context.Pixels;
-                var result = BitmapFactory.New(nWidth, nHeight);
-
-                using (var dest = result.GetBitmapContext())
+                var rp = dest.Pixels;
+                var len = context.Length;
+                for (var i = 0; i < len; i++)
                 {
-                    var rp = dest.Pixels;
-                    var len = context.Length;
-                    for (var i = 0; i < len; i++)
-                    {
-                        // Extract
-                        var c = px[i];
-                        var a = (c >> 24) & 0x000000FF;
-                        var r = (c >> 16) & 0x000000FF;
-                        var g = (c >> 8) & 0x000000FF;
-                        var b = (c) & 0x000000FF;
+                    // Extract
+                    var c = px[i];
+                    var a = (c >> 24) & 0x000000FF;
+                    var r = (c >> 16) & 0x000000FF;
+                    var g = (c >> 8) & 0x000000FF;
+                    var b = (c) & 0x000000FF;
 
-                        // Brightness adjustment
-                        r += nLevel;
-                        g += nLevel;
-                        b += nLevel;
+                    // Brightness adjustment
+                    r += nLevel;
+                    g += nLevel;
+                    b += nLevel;
 
-                        // Clamp
-                        r = r < 0 ? 0 : r > 255 ? 255 : r;
-                        g = g < 0 ? 0 : g > 255 ? 255 : g;
-                        b = b < 0 ? 0 : b > 255 ? 255 : b;
+                    // Clamp
+                    r = r < 0 ? 0 : r > 255 ? 255 : r;
+                    g = g < 0 ? 0 : g > 255 ? 255 : g;
+                    b = b < 0 ? 0 : b > 255 ? 255 : b;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                    }
+                    // Set
+                    rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         /// <summary>
@@ -366,44 +352,42 @@ namespace System.Windows.Media.Imaging
         /// <returns>The new WriteableBitmap.</returns>
         public static WriteableBitmap AdjustGamma(this WriteableBitmap bmp, double value)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            var nWidth = context.Width;
+            var nHeight = context.Height;
+            var px = context.Pixels;
+            var result = BitmapFactory.New(nWidth, nHeight);
+
+            using (var dest = result.GetBitmapContext())
             {
-                var nWidth = context.Width;
-                var nHeight = context.Height;
-                var px = context.Pixels;
-                var result = BitmapFactory.New(nWidth, nHeight);
-
-                using (var dest = result.GetBitmapContext())
+                var rp = dest.Pixels;
+                var gammaCorrection = 1.0 / value;
+                var len = context.Length;
+                for (var i = 0; i < len; i++)
                 {
-                    var rp = dest.Pixels;
-                    var gammaCorrection = 1.0 / value;
-                    var len = context.Length;
-                    for (var i = 0; i < len; i++)
-                    {
-                        // Extract
-                        var c = px[i];
-                        var a = (c >> 24) & 0x000000FF;
-                        var r = (c >> 16) & 0x000000FF;
-                        var g = (c >> 8) & 0x000000FF;
-                        var b = (c) & 0x000000FF;
+                    // Extract
+                    var c = px[i];
+                    var a = (c >> 24) & 0x000000FF;
+                    var r = (c >> 16) & 0x000000FF;
+                    var g = (c >> 8) & 0x000000FF;
+                    var b = (c) & 0x000000FF;
 
-                        // Gamma adjustment
-                        r = (int)(255.0 * Math.Pow(r / 255.0, gammaCorrection));
-                        g = (int)(255.0 * Math.Pow(g / 255.0, gammaCorrection));
-                        b = (int)(255.0 * Math.Pow(b / 255.0, gammaCorrection));
+                    // Gamma adjustment
+                    r = (int)(255.0 * Math.Pow(r / 255.0, gammaCorrection));
+                    g = (int)(255.0 * Math.Pow(g / 255.0, gammaCorrection));
+                    b = (int)(255.0 * Math.Pow(b / 255.0, gammaCorrection));
 
-                        // Clamps
-                        r = r < 0 ? 0 : r > 255 ? 255 : r;
-                        g = g < 0 ? 0 : g > 255 ? 255 : g;
-                        b = b < 0 ? 0 : b > 255 ? 255 : b;
+                    // Clamps
+                    r = r < 0 ? 0 : r > 255 ? 255 : r;
+                    g = g < 0 ? 0 : g > 255 ? 255 : g;
+                    b = b < 0 ? 0 : b > 255 ? 255 : b;
 
-                        // Set
-                        rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
-                    }
+                    // Set
+                    rp[i] = (a << 24) | (r << 16) | (g << 8) | b;
                 }
-
-                return result;
             }
+
+            return result;
         }
 
         #endregion

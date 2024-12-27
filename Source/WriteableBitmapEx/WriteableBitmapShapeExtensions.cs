@@ -49,23 +49,21 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color for the line.</param>
         public static void DrawPolyline(this WriteableBitmap bmp, int[] points, int color)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = context.Width;
+            var h = context.Height;
+            var x1 = points[0];
+            var y1 = points[1];
+
+            for (var i = 2; i < points.Length; i += 2)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
-                var x1 = points[0];
-                var y1 = points[1];
+                var x2 = points[i];
+                var y2 = points[i + 1];
 
-                for (var i = 2; i < points.Length; i += 2)
-                {
-                    var x2 = points[i];
-                    var y2 = points[i + 1];
-
-                    DrawLine(context, w, h, x1, y1, x2, y2, color);
-                    x1 = x2;
-                    y1 = y2;
-                }
+                DrawLine(context, w, h, x1, y1, x2, y2, color);
+                x1 = x2;
+                y1 = y2;
             }
         }
 
@@ -102,23 +100,21 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color for the line.</param>
         public static void DrawPolylineAa(this WriteableBitmap bmp, int[] points, int color)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = context.Width;
+            var h = context.Height;
+            var x1 = points[0];
+            var y1 = points[1];
+
+            for (var i = 2; i < points.Length; i += 2)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
-                var x1 = points[0];
-                var y1 = points[1];
+                var x2 = points[i];
+                var y2 = points[i + 1];
 
-                for (var i = 2; i < points.Length; i += 2)
-                {
-                    var x2 = points[i];
-                    var y2 = points[i + 1];
-
-                    DrawLineAa(context, w, h, x1, y1, x2, y2, color);
-                    x1 = x2;
-                    y1 = y2;
-                }
+                DrawLineAa(context, w, h, x1, y1, x2, y2, color);
+                x1 = x2;
+                y1 = y2;
             }
         }
 
@@ -131,23 +127,21 @@ namespace System.Windows.Media.Imaging
         /// <param name="thickness">The thickness for the line.</param>
         public static void DrawPolylineAa(this WriteableBitmap bmp, int[] points, int color, int thickness)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = context.Width;
+            var h = context.Height;
+            var x1 = points[0];
+            var y1 = points[1];
+
+            for (var i = 2; i < points.Length; i += 2)
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
-                var x1 = points[0];
-                var y1 = points[1];
+                var x2 = points[i];
+                var y2 = points[i + 1];
 
-                for (var i = 2; i < points.Length; i += 2)
-                {
-                    var x2 = points[i];
-                    var y2 = points[i + 1];
-
-                    DrawLineAa(context, w, h, x1, y1, x2, y2, color, thickness);
-                    x1 = x2;
-                    y1 = y2;
-                }
+                DrawLineAa(context, w, h, x1, y1, x2, y2, color, thickness);
+                x1 = x2;
+                y1 = y2;
             }
         }
 
@@ -181,16 +175,14 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void DrawTriangle(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int x3, int y3, int color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
 
-                DrawLine(context, w, h, x1, y1, x2, y2, color);
-                DrawLine(context, w, h, x2, y2, x3, y3, color);
-                DrawLine(context, w, h, x3, y3, x1, y1, color);
-            }
+            DrawLine(context, w, h, x1, y1, x2, y2, color);
+            DrawLine(context, w, h, x2, y2, x3, y3, color);
+            DrawLine(context, w, h, x3, y3, x1, y1, color);
         }
 
         /// <summary>
@@ -227,17 +219,15 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void DrawQuad(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int color)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                // Use refs for faster access (really important!) speeds up a lot!
-                int w = context.Width;
-                int h = context.Height;
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            int w = context.Width;
+            int h = context.Height;
 
-                DrawLine(context, w, h, x1, y1, x2, y2, color);
-                DrawLine(context, w, h, x2, y2, x3, y3, color);
-                DrawLine(context, w, h, x3, y3, x4, y4, color);
-                DrawLine(context, w, h, x4, y4, x1, y1, color);
-            }
+            DrawLine(context, w, h, x1, y1, x2, y2, color);
+            DrawLine(context, w, h, x2, y2, x3, y3, color);
+            DrawLine(context, w, h, x3, y3, x4, y4, color);
+            DrawLine(context, w, h, x4, y4, x1, y1, color);
         }
 
         #endregion
@@ -272,57 +262,55 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void DrawRectangle(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color)
         {
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+            // Use refs for faster access (really important!) speeds up a lot!
+            var w = context.Width;
+            var h = context.Height;
+            var pixels = context.Pixels;
+
+            // Check boundaries
+            if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
+             || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
             {
-                // Use refs for faster access (really important!) speeds up a lot!
-                var w = context.Width;
-                var h = context.Height;
-                var pixels = context.Pixels;
+                return;
+            }
 
-                // Check boundaries
-                if ((x1 < 0 && x2 < 0) || (y1 < 0 && y2 < 0)
-                 || (x1 >= w && x2 >= w) || (y1 >= h && y2 >= h))
-                {
-                    return;
-                }
+            // Clamp boundaries
+            if (x1 < 0) { x1 = 0; }
+            if (y1 < 0) { y1 = 0; }
+            if (x2 < 0) { x2 = 0; }
+            if (y2 < 0) { y2 = 0; }
+            if (x1 >= w) { x1 = w - 1; }
+            if (y1 >= h) { y1 = h - 1; }
+            if (x2 >= w) { x2 = w - 1; }
+            if (y2 >= h) { y2 = h - 1; }
 
-                // Clamp boundaries
-                if (x1 < 0) { x1 = 0; }
-                if (y1 < 0) { y1 = 0; }
-                if (x2 < 0) { x2 = 0; }
-                if (y2 < 0) { y2 = 0; }
-                if (x1 >= w) { x1 = w - 1; }
-                if (y1 >= h) { y1 = h - 1; }
-                if (x2 >= w) { x2 = w - 1; }
-                if (y2 >= h) { y2 = h - 1; }
+            var startY = y1 * w;
+            var endY = y2 * w;
 
-                var startY = y1 * w;
-                var endY = y2 * w;
+            var offset2 = endY + x1;
+            var endOffset = startY + x2;
+            var startYPlusX1 = startY + x1;
 
-                var offset2 = endY + x1;
-                var endOffset = startY + x2;
-                var startYPlusX1 = startY + x1;
+            // top and bottom horizontal scanlines
+            for (var x = startYPlusX1; x <= endOffset; x++)
+            {
+                pixels[x] = color; // top horizontal line
+                pixels[offset2] = color; // bottom horizontal line
+                offset2++;
+            }
 
-                // top and bottom horizontal scanlines
-                for (var x = startYPlusX1; x <= endOffset; x++)
-                {
-                    pixels[x] = color; // top horizontal line
-                    pixels[offset2] = color; // bottom horizontal line
-                    offset2++;
-                }
+            // offset2 == endY + x2
 
-                // offset2 == endY + x2
+            // vertical scanlines
+            endOffset = startYPlusX1 + w;
+            offset2 -= w;
 
-                // vertical scanlines
-                endOffset = startYPlusX1 + w;
-                offset2 -= w;
-
-                for (var y = startY + x2 + w; y <= offset2; y += w)
-                {
-                    pixels[y] = color; // right vertical line
-                    pixels[endOffset] = color; // left vertical line
-                    endOffset += w;
-                }
+            for (var y = startY + x2 + w; y <= offset2; y += w)
+            {
+                pixels[y] = color; // right vertical line
+                pixels[endOffset] = color; // left vertical line
+                endOffset += w;
             }
         }
 
@@ -395,142 +383,140 @@ namespace System.Windows.Media.Imaging
         public static void DrawEllipseCentered(this WriteableBitmap bmp, int xc, int yc, int xr, int yr, int color)
         {
             // Use refs for faster access (really important!) speeds up a lot!
-            using (var context = bmp.GetBitmapContext())
+            using var context = bmp.GetBitmapContext();
+
+            var pixels = context.Pixels;
+            var w = context.Width;
+            var h = context.Height;
+
+            // Avoid endless loop
+            if (xr < 1 || yr < 1)
             {
+                return;
+            }
 
-                var pixels = context.Pixels;
-                var w = context.Width;
-                var h = context.Height;
+            // Init vars
+            int uh, lh, uy, ly, lx, rx;
+            int x = xr;
+            int y = 0;
+            int xrSqTwo = (xr * xr) << 1;
+            int yrSqTwo = (yr * yr) << 1;
+            int xChg = yr * yr * (1 - (xr << 1));
+            int yChg = xr * xr;
+            int err = 0;
+            int xStopping = yrSqTwo * xr;
+            int yStopping = 0;
 
-                // Avoid endless loop
-                if (xr < 1 || yr < 1)
+            // Draw first set of points counter clockwise where tangent line slope > -1.
+            while (xStopping >= yStopping)
+            {
+                // Draw 4 quadrant points at once
+                uy = yc + y;                  // Upper half
+                ly = yc - y;                  // Lower half
+
+                rx = xc + x;
+                lx = xc - x;
+
+                if (0 <= uy && uy < h)
                 {
-                    return;
+                    uh = uy * w;              // Upper half
+                    if (0 <= rx && rx < w)
+                    {
+                        pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
+                    }
+
+                    if (0 <= lx && lx < w)
+                    {
+                        pixels[lx + uh] = color;      // Quadrant II
+                    }
                 }
 
-                // Init vars
-                int uh, lh, uy, ly, lx, rx;
-                int x = xr;
-                int y = 0;
-                int xrSqTwo = (xr * xr) << 1;
-                int yrSqTwo = (yr * yr) << 1;
-                int xChg = yr * yr * (1 - (xr << 1));
-                int yChg = xr * xr;
-                int err = 0;
-                int xStopping = yrSqTwo * xr;
-                int yStopping = 0;
-
-                // Draw first set of points counter clockwise where tangent line slope > -1.
-                while (xStopping >= yStopping)
+                if (0 <= ly && ly < h)
                 {
-                    // Draw 4 quadrant points at once
-                    uy = yc + y;                  // Upper half
-                    ly = yc - y;                  // Lower half
+                    lh = ly * w;              // Lower half
+                    if (0 <= lx && lx < w)
+                    {
+                        pixels[lx + lh] = color;      // Quadrant III
+                    }
 
-                    rx = xc + x;
-                    lx = xc - x;
+                    if (0 <= rx && rx < w)
+                    {
+                        pixels[rx + lh] = color;      // Quadrant IV
+                    }
+                }
 
+                y++;
+                yStopping += xrSqTwo;
+                err += yChg;
+                yChg += xrSqTwo;
+                if ((xChg + (err << 1)) > 0)
+                {
+                    x--;
+                    xStopping -= yrSqTwo;
+                    err += xChg;
+                    xChg += yrSqTwo;
+                }
+            }
+
+            // ReInit vars
+            x = 0;
+            y = yr;
+            uy = yc + y;                  // Upper half
+            ly = yc - y;                  // Lower half
+            uh = uy * w;                  // Upper half
+            lh = ly * w;                  // Lower half
+            xChg = yr * yr;
+            yChg = xr * xr * (1 - (yr << 1));
+            err = 0;
+            xStopping = 0;
+            yStopping = xrSqTwo * yr;
+
+            // Draw second set of points clockwise where tangent line slope < -1.
+            while (xStopping <= yStopping)
+            {
+                // Draw 4 quadrant points at once
+                rx = xc + x;
+                if (0 <= rx && rx < w)
+                {
                     if (0 <= uy && uy < h)
                     {
-                        uh = uy * w;              // Upper half
-                        if (0 <= rx && rx < w)
-                        {
-                            pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
-                        }
-
-                        if (0 <= lx && lx < w)
-                        {
-                            pixels[lx + uh] = color;      // Quadrant II
-                        }
+                        pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
                     }
 
                     if (0 <= ly && ly < h)
                     {
-                        lh = ly * w;              // Lower half
-                        if (0 <= lx && lx < w)
-                        {
-                            pixels[lx + lh] = color;      // Quadrant III
-                        }
-
-                        if (0 <= rx && rx < w)
-                        {
-                            pixels[rx + lh] = color;      // Quadrant IV
-                        }
-                    }
-
-                    y++;
-                    yStopping += xrSqTwo;
-                    err += yChg;
-                    yChg += xrSqTwo;
-                    if ((xChg + (err << 1)) > 0)
-                    {
-                        x--;
-                        xStopping -= yrSqTwo;
-                        err += xChg;
-                        xChg += yrSqTwo;
+                        pixels[rx + lh] = color;      // Quadrant IV
                     }
                 }
 
-                // ReInit vars
-                x = 0;
-                y = yr;
-                uy = yc + y;                  // Upper half
-                ly = yc - y;                  // Lower half
-                uh = uy * w;                  // Upper half
-                lh = ly * w;                  // Lower half
-                xChg = yr * yr;
-                yChg = xr * xr * (1 - (yr << 1));
-                err = 0;
-                xStopping = 0;
-                yStopping = xrSqTwo * yr;
-
-                // Draw second set of points clockwise where tangent line slope < -1.
-                while (xStopping <= yStopping)
+                lx = xc - x;
+                if (0 <= lx && lx < w)
                 {
-                    // Draw 4 quadrant points at once
-                    rx = xc + x;
-                    if (0 <= rx && rx < w)
+                    if (0 <= uy && uy < h)
                     {
-                        if (0 <= uy && uy < h)
-                        {
-                            pixels[rx + uh] = color;      // Quadrant I (Actually an octant)
-                        }
-
-                        if (0 <= ly && ly < h)
-                        {
-                            pixels[rx + lh] = color;      // Quadrant IV
-                        }
+                        pixels[lx + uh] = color;      // Quadrant II
                     }
 
-                    lx = xc - x;
-                    if (0 <= lx && lx < w)
+                    if (0 <= ly && ly < h)
                     {
-                        if (0 <= uy && uy < h)
-                        {
-                            pixels[lx + uh] = color;      // Quadrant II
-                        }
-
-                        if (0 <= ly && ly < h)
-                        {
-                            pixels[lx + lh] = color;      // Quadrant III
-                        }
+                        pixels[lx + lh] = color;      // Quadrant III
                     }
+                }
 
-                    x++;
-                    xStopping += yrSqTwo;
-                    err += xChg;
-                    xChg += yrSqTwo;
-                    if ((yChg + (err << 1)) > 0)
-                    {
-                        y--;
-                        uy = yc + y;                  // Upper half
-                        ly = yc - y;                  // Lower half
-                        uh = uy * w;                  // Upper half
-                        lh = ly * w;                  // Lower half
-                        yStopping -= xrSqTwo;
-                        err += yChg;
-                        yChg += xrSqTwo;
-                    }
+                x++;
+                xStopping += yrSqTwo;
+                err += xChg;
+                xChg += yrSqTwo;
+                if ((yChg + (err << 1)) > 0)
+                {
+                    y--;
+                    uy = yc + y;                  // Upper half
+                    ly = yc - y;                  // Lower half
+                    uh = uy * w;                  // Upper half
+                    lh = ly * w;                  // Lower half
+                    yStopping -= xrSqTwo;
+                    err += yChg;
+                    yChg += xrSqTwo;
                 }
             }
         }

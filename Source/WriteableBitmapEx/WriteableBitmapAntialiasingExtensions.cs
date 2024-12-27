@@ -26,7 +26,7 @@ namespace System.Windows.Media.Imaging
         private static int[] leftEdgeX;
         private static int[] rightEdgeX;
 
-        private static void AAWidthLine(int width, int height, BitmapContext context, float x1, float y1, float x2, float y2, float lineWidth, Int32 color, Rect? clipRect = null)
+        private static void AAWidthLine(int width, int height, BitmapContext context, float x1, float y1, float x2, float y2, float lineWidth, int color, Rect? clipRect = null)
         {
             // Perform cohen-sutherland clipping if either point is out of the viewport
             if (!CohenSutherlandLineClip(clipRect ?? new Rect(0, 0, width, height), ref x1, ref y1, ref x2, ref y2))
@@ -178,10 +178,10 @@ namespace System.Windows.Media.Imaging
                         var g = (byte)((color & 0x0000ff00) >> 8);
                         var b = (byte)((color & 0x000000ff) >> 0);
 
-                        Byte rs, gs, bs;
-                        Byte rd, gd, bd;
+                        byte rs, gs, bs;
+                        byte rd, gd, bd;
 
-                        Int32 d;
+                        int d;
 
                         rs = r;
                         gs = g;
@@ -345,10 +345,10 @@ namespace System.Windows.Media.Imaging
                     var g = (byte)((color & 0x0000ff00) >> 8);
                     var b = (byte)((color & 0x000000ff) >> 0);
 
-                    Byte rs, gs, bs;
-                    Byte rd, gd, bd;
+                    byte rs, gs, bs;
+                    byte rd, gd, bd;
 
-                    Int32 d;
+                    int d;
 
                     rs = r;
                     gs = g;
@@ -376,9 +376,9 @@ namespace System.Windows.Media.Imaging
             b = t;
         }
 
-        private static void AALineQ1(int width, int height, BitmapContext context, int x1, int y1, int x2, int y2, Int32 color, bool minEdge, bool leftEdge)
+        private static void AALineQ1(int width, int height, BitmapContext context, int x1, int y1, int x2, int y2, int color, bool minEdge, bool leftEdge)
         {
-            Byte off = 0;
+            byte off = 0;
 
             if (minEdge)
             {
@@ -414,30 +414,20 @@ namespace System.Windows.Media.Imaging
             int x = x1;
             int y = y1;
 
-            UInt16 m = 0;
-
-            if (deltax > deltay)
-            {
-                m = (ushort)((deltay << 16) / deltax);
-            }
-            else
-            {
-                m = (ushort)((deltax << 16) / deltay);
-            }
-
-            UInt16 e = 0;
+            ushort m = deltax > deltay ? (ushort)((deltay << 16) / deltax) : (ushort)((deltax << 16) / deltay);
+            ushort e = 0;
 
             var a = (byte)((color & 0xff000000) >> 24);
             var r = (byte)((color & 0x00ff0000) >> 16);
             var g = (byte)((color & 0x0000ff00) >> 8);
             var b = (byte)((color & 0x000000ff) >> 0);
 
-            Byte rs, gs, bs;
-            Byte rd, gd, bd;
+            byte rs, gs, bs;
+            byte rd, gd, bd;
 
-            Int32 d;
+            int d;
 
-            Byte ta = a;
+            byte ta = a;
 
             e = 0;
 
@@ -445,7 +435,7 @@ namespace System.Windows.Media.Imaging
             {
                 while (deltax-- != 0)
                 {
-                    if ((UInt16)(e + m) <= e) // Roll
+                    if ((ushort)(e + m) <= e) // Roll
                     {
                         y++;
                     }
@@ -482,7 +472,7 @@ namespace System.Windows.Media.Imaging
 
                     //
 
-                    ta = (byte)((a * (UInt16)(((UInt16)(e >> 8)) ^ off)) >> 8);
+                    ta = (byte)((a * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8);
 
                     rs = r;
                     gs = g;
@@ -509,7 +499,7 @@ namespace System.Windows.Media.Imaging
 
                 while (--deltay != 0)
                 {
-                    if ((UInt16)(e + m) <= e) // Roll
+                    if ((ushort)(e + m) <= e) // Roll
                     {
                         if (x1 < x2)
                         {
@@ -537,7 +527,7 @@ namespace System.Windows.Media.Imaging
 
                     //
 
-                    ta = (byte)((a * (UInt16)(((UInt16)(e >> 8)) ^ off)) >> 8);
+                    ta = (byte)((a * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8);
 
                     rs = r;
                     gs = g;

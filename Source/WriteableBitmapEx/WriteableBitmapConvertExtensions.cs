@@ -38,19 +38,17 @@ namespace System.Windows.Media.Imaging
         /// <returns>The color buffer as byte ARGB values.</returns>
         public static byte[] ToByteArray(this WriteableBitmap bmp, int offset, int count)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            if (count == -1)
             {
-                if (count == -1)
-                {
-                    // Copy all to byte array
-                    count = context.Length;
-                }
-
-                var len = count * SizeOfArgb;
-                var result = new byte[len]; // ARGB
-                BitmapContext.BlockCopy(context, offset, result, 0, len);
-                return result;
+                // Copy all to byte array
+                count = context.Length;
             }
+
+            var len = count * SizeOfArgb;
+            var result = new byte[len]; // ARGB
+            BitmapContext.BlockCopy(context, offset, result, 0, len);
+            return result;
         }
 
         /// <summary>
@@ -84,11 +82,9 @@ namespace System.Windows.Media.Imaging
         /// <returns>The WriteableBitmap that was passed as parameter.</returns>
         public static WriteableBitmap FromByteArray(this WriteableBitmap bmp, byte[] buffer, int offset, int count)
         {
-            using (var context = bmp.GetBitmapContext())
-            {
-                BitmapContext.BlockCopy(buffer, offset, context, 0, count);
-                return bmp;
-            }
+            using var context = bmp.GetBitmapContext();
+            BitmapContext.BlockCopy(buffer, offset, context, 0, count);
+            return bmp;
         }
 
         /// <summary>
@@ -126,49 +122,48 @@ namespace System.Windows.Media.Imaging
         /// <param name="destination">The destination stream.</param>
         public static void WriteTga(this WriteableBitmap bmp, Stream destination)
         {
-            using (var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
+            using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
+            int width = context.Width;
+            int height = context.Height;
+            var pixels = context.Pixels;
+            byte[] data = new byte[context.Length * SizeOfArgb];
+
+            // Copy bitmap data as BGRA
+            int offsetSource = 0;
+            int width4 = width << 2;
+            int width8 = width << 3;
+            int offsetDest = (height - 1) * width4;
+            for (int y = 0; y < height; y++)
             {
-                int width = context.Width;
-                int height = context.Height;
-                var pixels = context.Pixels;
-                byte[] data = new byte[context.Length * SizeOfArgb];
-
-                // Copy bitmap data as BGRA
-                int offsetSource = 0;
-                int width4 = width << 2;
-                int width8 = width << 3;
-                int offsetDest = (height - 1) * width4;
-                for (int y = 0; y < height; y++)
+                for (int x = 0; x < width; x++)
                 {
-                    for (int x = 0; x < width; x++)
+                    // Account for pre-multiplied alpha
+                    int c = pixels[offsetSource];
+                    var a = (byte)(c >> 24);
+
+                    // Prevent division by zero
+                    int ai = a;
+                    if (ai == 0)
                     {
-                        // Account for pre-multiplied alpha
-                        int c = pixels[offsetSource];
-                        var a = (byte)(c >> 24);
-
-                        // Prevent division by zero
-                        int ai = a;
-                        if (ai == 0)
-                        {
-                            ai = 1;
-                        }
-
-                        // Scale inverse alpha to use cheap integer mul bit shift
-                        ai = (255 << 8) / ai;
-                        data[offsetDest + 3] = a;                                      // A
-                        data[offsetDest + 2] = (byte)((((c >> 16) & 0xFF) * ai) >> 8); // R
-                        data[offsetDest + 1] = (byte)((((c >> 8) & 0xFF) * ai) >> 8);  // G
-                        data[offsetDest] = (byte)(((c & 0xFF) * ai) >> 8);           // B
-
-                        offsetSource++;
-                        offsetDest += SizeOfArgb;
+                        ai = 1;
                     }
-                    offsetDest -= width8;
-                }
 
-                // Create header
-                var header = new byte[]
-         {
+                    // Scale inverse alpha to use cheap integer mul bit shift
+                    ai = (255 << 8) / ai;
+                    data[offsetDest + 3] = a;                                      // A
+                    data[offsetDest + 2] = (byte)((((c >> 16) & 0xFF) * ai) >> 8); // R
+                    data[offsetDest + 1] = (byte)((((c >> 8) & 0xFF) * ai) >> 8);  // G
+                    data[offsetDest] = (byte)(((c & 0xFF) * ai) >> 8);           // B
+
+                    offsetSource++;
+                    offsetDest += SizeOfArgb;
+                }
+                offsetDest -= width8;
+            }
+
+            // Create header
+            var header = new byte[]
+     {
             0, // ID length
             0, // no color map
             2, // uncompressed, true color
@@ -181,15 +176,12 @@ namespace System.Windows.Media.Imaging
             (byte)((height & 0xFF00) >> 8),
             32, // 32 bit bitmap
             0
-         };
+     };
 
-                // Write header and data
-                using (var writer = new BinaryWriter(destination))
-                {
-                    writer.Write(header);
-                    writer.Write(data);
-                }
-            }
+            // Write header and data
+            using var writer = new BinaryWriter(destination);
+            writer.Write(header);
+            writer.Write(data);
         }
 
         #endregion
