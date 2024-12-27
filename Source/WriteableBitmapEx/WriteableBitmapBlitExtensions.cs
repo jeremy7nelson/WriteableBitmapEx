@@ -16,22 +16,12 @@
 //
 #endregion
 
-#if NETFX_CORE
-using Windows.Foundation;
-
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
     /// <summary>
     /// Collection of blit (copy) extension methods for the WriteableBitmap class.
     /// </summary>
-    public
-#if WPF
-    unsafe
-#endif
- static partial class WriteableBitmapExtensions
+    public static unsafe partial class WriteableBitmapExtensions
     {
         #region Enum
 
@@ -140,9 +130,7 @@ namespace System.Windows.Media.Imaging
 
             using (var srcContext = source.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-#if WPF
                 var isPrgba = srcContext.Format == PixelFormats.Pbgra32 || srcContext.Format == PixelFormats.Prgba64 || srcContext.Format == PixelFormats.Prgba128Float;
-#endif
                 using (var destContext = bmp.GetBitmapContext())
                 {
                     var sourceWidth = srcContext.Width;
@@ -259,7 +247,6 @@ namespace System.Windows.Media.Imaging
                                             {
                                                 destPixels[idx] = sourcePixel;
                                             }
-
                                         }
                                         else if (blendMode == BlendMode.Mask)
                                         {
@@ -294,13 +281,6 @@ namespace System.Windows.Media.Imaging
                                                 if (blendMode == BlendMode.Alpha)
                                                 {
                                                     var isa = 255 - sa;
-#if NETFX_CORE
-                                                     // Special case for WinRT since it does not use pARGB (pre-multiplied alpha)
-                                                     destPixel = ((da & 0xff) << 24) |
-                                                                 ((((sr * sa + isa * dr) >> 8) & 0xff) << 16) |
-                                                                 ((((sg * sa + isa * dg) >> 8) & 0xff) <<  8) |
-                                                                  (((sb * sa + isa * db) >> 8) & 0xff);
-#elif WPF
                                                     if (isPrgba)
                                                     {
                                                         destPixel = ((da & 0xff) << 24) |
@@ -315,12 +295,6 @@ namespace System.Windows.Media.Imaging
                                                                     (((((sg * sa) + isa * dg) >> 8) & 0xff) <<  8) |
                                                                      ((((sb * sa) + isa * db) >> 8) & 0xff);
                                                     }
-#else
-                                                        destPixel = ((da & 0xff) << 24) |
-                                                                    (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
-                                                                    (((((sg << 8) + isa * dg) >> 8) & 0xff) <<  8) |
-                                                                     ((((sb << 8) + isa * db) >> 8) & 0xff);
-#endif
                                                 }
                                                 else if (blendMode == BlendMode.Additive)
                                                 {
@@ -385,10 +359,8 @@ namespace System.Windows.Media.Imaging
             {
                 return;
             }
-#if WPF
-            var isPrgba = srcContext.Format == PixelFormats.Pbgra32 || srcContext.Format == PixelFormats.Prgba64 || srcContext.Format == PixelFormats.Prgba128Float;
-#endif
 
+            var isPrgba = srcContext.Format == PixelFormats.Pbgra32 || srcContext.Format == PixelFormats.Prgba64 || srcContext.Format == PixelFormats.Prgba128Float;
             var sourcePixels = srcContext.Pixels;
             var destPixels = destContext.Pixels;
             int sourceLength = srcContext.Length;
@@ -463,13 +435,6 @@ namespace System.Windows.Media.Imaging
                                     dg = ((destPixel >> 8) & 0xff);
                                     db = ((destPixel) & 0xff);
                                     var isa = 255 - sa;
-#if NETFX_CORE
-                                    // Special case for WinRT since it does not use pARGB (pre-multiplied alpha)
-                                    destPixel = ((da & 0xff) << 24) |
-                                                ((((sr * sa + isa * dr) >> 8) & 0xff) << 16) |
-                                                ((((sg * sa + isa * dg) >> 8) & 0xff) <<  8) |
-                                                (((sb * sa + isa * db) >> 8) & 0xff);
-#elif WPF
                                     if (isPrgba)
                                     {
                                         destPixel = ((da & 0xff) << 24) |
@@ -484,12 +449,6 @@ namespace System.Windows.Media.Imaging
                                                     (((((sg * sa) + isa * dg) >> 8) & 0xff) << 8) |
                                                      ((((sb * sa) + isa * db) >> 8) & 0xff);
                                     }
-#else
-                                    destPixel = ((da & 0xff) << 24) |
-                                                (((((sr << 8) + isa * dr) >> 8) & 0xff) << 16) |
-                                                (((((sg << 8) + isa * dg) >> 8) & 0xff) << 8) |
-                                                 ((((sb << 8) + isa * db) >> 8) & 0xff);
-#endif
                                     destPixels[idx] = destPixel;
                                 }
                             }
@@ -502,9 +461,7 @@ namespace System.Windows.Media.Imaging
                 jj += sdy;
                 y++;
             }
-
         }
-
 
         /// <summary>
         /// Renders a bitmap using any affine transformation and transparency into this bitmap
@@ -549,15 +506,10 @@ namespace System.Windows.Media.Imaging
                     int endX = (int)bounds.Right;
                     int endY = (int)bounds.Bottom;
 
-#if NETFX_CORE
-                    Point zeroZero = inverse.TransformPoint(new Point(startX, startY));
-                    Point oneZero = inverse.TransformPoint(new Point(startX + 1, startY));
-                    Point zeroOne = inverse.TransformPoint(new Point(startX, startY + 1));
-#else
                     Point zeroZero = inverse.Transform(new Point(startX, startY));
                     Point oneZero = inverse.Transform(new Point(startX + 1, startY));
                     Point zeroOne = inverse.Transform(new Point(startX, startY + 1));
-#endif
+
                     float sourceXf = ((float)zeroZero.X);
                     float sourceYf = ((float)zeroZero.Y);
                     int dxDx = (int)((((float)oneZero.X) - sourceXf) * PRECISION_VALUE); // for 1 unit in X coord, how much does X change in source texture?
@@ -689,7 +641,6 @@ namespace System.Windows.Media.Imaging
                 }
             }
         }
-
 
         #endregion
     }

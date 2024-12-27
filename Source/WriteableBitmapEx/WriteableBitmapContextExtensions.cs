@@ -16,11 +16,7 @@
 //
 #endregion
 
-#if NETFX_CORE
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
     /// <summary>
     /// Provides the WriteableBitmap context pixel data

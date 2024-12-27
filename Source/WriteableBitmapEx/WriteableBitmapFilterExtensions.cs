@@ -16,20 +16,12 @@
 //
 #endregion
 
-#if NETFX_CORE
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
     /// <summary>
     /// Collection of filter / convolution extension methods for the WriteableBitmap class.
     /// </summary>
-    public
-#if WPF
- unsafe
-#endif
- static partial class WriteableBitmapExtensions
+    public static unsafe partial class WriteableBitmapExtensions
     {
         #region Kernels
 

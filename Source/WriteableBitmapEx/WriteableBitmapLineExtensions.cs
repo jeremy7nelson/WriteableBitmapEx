@@ -16,19 +16,9 @@
 //
 #endregion
 
-#if NETFX_CORE
-using Windows.Foundation;
-
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
-    public
-#if WPF
-        unsafe
-#endif
- static partial class WriteableBitmapExtensions
+    public static unsafe partial class WriteableBitmapExtensions
     {
         #region Normal line
 

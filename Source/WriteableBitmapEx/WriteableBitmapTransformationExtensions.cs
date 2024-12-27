@@ -16,22 +16,12 @@
 //
 #endregion
 
-#if NETFX_CORE
-using Windows.Foundation;
-
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
     /// <summary>
     /// Collection of transformation extension methods for the WriteableBitmap class.
     /// </summary>
-    public
-#if WPF
- unsafe
-#endif
- static partial class WriteableBitmapExtensions
+    public static unsafe partial class WriteableBitmapExtensions
     {
         #region Enums
 
@@ -87,7 +77,6 @@ namespace System.Windows.Media.Imaging
             var numberOfChannels = bmp.BackBufferStride / bmp.PixelWidth;
             if (numberOfChannels != SizeOfArgb)
                 throw new NotSupportedException("The format of this image is not supported, Consider calling BitmapFactory.ConvertToPbgra32Format()");
-
 
             using (var srcContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
@@ -184,11 +173,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="height">The new desired height.</param>
         /// <param name="interpolation">The interpolation method that should be used.</param>
         /// <returns>A new bitmap that is a resized version of the input.</returns>
-#if WPF
         public static int[] Resize(int* pixels, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
-#else
-      public static int[] Resize(int[] pixels, int widthSource, int heightSource, int width, int height, Interpolation interpolation)
-#endif
         {
             var pd = new int[width * height];
             var xs = (float)widthSource / width;
@@ -426,7 +411,6 @@ namespace System.Windows.Media.Imaging
             int iWidth, iHeight, newWidth, newHeight;
             using (var bmpContext = bmp.GetBitmapContext(ReadWriteMode.ReadOnly))
             {
-
                 iWidth = bmpContext.Width;
                 iHeight = bmpContext.Height;
 
@@ -441,7 +425,6 @@ namespace System.Windows.Media.Imaging
                     newWidth = (int)Math.Ceiling(Math.Abs(Math.Sin(rad) * iHeight) + Math.Abs(Math.Cos(rad) * iWidth));
                     newHeight = (int)Math.Ceiling(Math.Abs(Math.Sin(rad) * iWidth) + Math.Abs(Math.Cos(rad) * iHeight));
                 }
-
 
                 iCentreX = iWidth / 2;
                 iCentreY = iHeight / 2;

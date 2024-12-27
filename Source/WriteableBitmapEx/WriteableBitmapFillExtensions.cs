@@ -16,20 +16,12 @@
 //
 #endregion
 
-#if NETFX_CORE
-namespace Windows.UI.Xaml.Media.Imaging
-#else
 namespace System.Windows.Media.Imaging
-#endif
 {
     /// <summary>
     /// Collection of extension methods for the WriteableBitmap class.
     /// </summary>
-    public
-#if WPF
- unsafe
-#endif
- static partial class WriteableBitmapExtensions
+    public static unsafe partial class WriteableBitmapExtensions
     {
         #region Methods
 
@@ -467,7 +459,6 @@ namespace System.Windows.Media.Imaging
                 if (yMin < 0) yMin = 0;
                 if (yMax >= h) yMax = h - 1;
 
-
                 // Scan line from min to max
                 for (int y = yMin; y <= yMax; y++)
                 {
@@ -534,7 +525,6 @@ namespace System.Windows.Media.Imaging
                 }
             }
         }
-
 
         #region Multiple (possibly nested) Polygons
         /// <summary>
@@ -673,7 +663,6 @@ namespace System.Windows.Media.Imaging
                 return;
             }
             // could use single polygon fill if count is 1, but it the algorithm used there is slower (at least for larger polygons)
-
 
             using (var context = bmp.GetBitmapContext())
             {
