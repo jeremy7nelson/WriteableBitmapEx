@@ -210,7 +210,7 @@ namespace System.Windows.Media.Imaging
                                 BitmapContext.BlockCopy(srcContext, (sourceIdx + offset) * 4, destContext, (idx + offset) * 4, len * 4);
                             }
 
-                     // Pixel by pixel copying
+                            // Pixel by pixel copying
                             else
                             {
                                 for (int i = 0; i < dw; i++)
@@ -293,14 +293,14 @@ namespace System.Windows.Media.Imaging
                                                     {
                                                         destPixel = ((da & 0xff) << 24) |
                                                                     (((((sr << 8) + (isa * dr)) >> 8) & 0xff) << 16) |
-                                                                    (((((sg << 8) + (isa * dg)) >> 8) & 0xff) <<  8) |
+                                                                    (((((sg << 8) + (isa * dg)) >> 8) & 0xff) << 8) |
                                                                      ((((sb << 8) + (isa * db)) >> 8) & 0xff);
                                                     }
                                                     else
                                                     {
                                                         destPixel = ((da & 0xff) << 24) |
                                                                     (((((sr * sa) + (isa * dr)) >> 8) & 0xff) << 16) |
-                                                                    (((((sg * sa) + (isa * dg)) >> 8) & 0xff) <<  8) |
+                                                                    (((((sg * sa) + (isa * dg)) >> 8) & 0xff) << 8) |
                                                                      ((((sb * sa) + (isa * db)) >> 8) & 0xff);
                                                     }
                                                 }
@@ -499,7 +499,7 @@ namespace System.Windows.Media.Imaging
                 int destWidth = destContext.Width;
                 int destHeight = destContext.Height;
                 var inverse = transform.Inverse;
-                if(shouldClear)
+                if (shouldClear)
                 {
                     destContext.Clear();
                 }

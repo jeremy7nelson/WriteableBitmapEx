@@ -88,10 +88,10 @@ namespace System.Windows.Media.Imaging
         /// <param name="points">The points of the polyline in x and y pairs, therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="thickness">The thickness for the line.</param>
-        public static void DrawPolylineAa(this WriteableBitmap bmp, int[] points, Color color,int thickness)
+        public static void DrawPolylineAa(this WriteableBitmap bmp, int[] points, Color color, int thickness)
         {
             var col = ConvertColor(color);
-            bmp.DrawPolylineAa(points, col,thickness);
+            bmp.DrawPolylineAa(points, col, thickness);
         }
 
         /// <summary>

@@ -219,7 +219,7 @@ namespace System.Windows.Media.Imaging
                 }
             }
 
-               // Bilinear
+            // Bilinear
             else if (interpolation == Interpolation.Bilinear)
             {
                 var srcIdx = 0;
