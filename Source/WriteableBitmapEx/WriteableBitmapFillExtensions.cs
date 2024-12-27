@@ -945,7 +945,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void FillQuad(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int color)
         {
-            bmp.FillPolygon(new int[] { x1, y1, x2, y2, x3, y3, x4, y4, x1, y1 }, color);
+            bmp.FillPolygon([x1, y1, x2, y2, x3, y3, x4, y4, x1, y1], color);
         }
 
         /// <summary>
@@ -978,7 +978,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         public static void FillTriangle(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int x3, int y3, int color)
         {
-            bmp.FillPolygon(new int[] { x1, y1, x2, y2, x3, y3, x1, y1 }, color);
+            bmp.FillPolygon([x1, y1, x2, y2, x3, y3, x1, y1], color);
         }
 
         #endregion
@@ -1100,7 +1100,7 @@ namespace System.Windows.Media.Imaging
             }
 
             // Fill
-            bmp.FillPolygon(list.ToArray(), color);
+            bmp.FillPolygon([.. list], color);
         }
 
         #endregion
@@ -1234,7 +1234,7 @@ namespace System.Windows.Media.Imaging
                 points[i + 3], points[i + 2], points[i + 3], tension));
 
             // Fill
-            bmp.FillPolygon(list.ToArray(), color);
+            bmp.FillPolygon([.. list], color);
         }
 
         /// <summary>
@@ -1284,7 +1284,7 @@ namespace System.Windows.Media.Imaging
                 points[1], points[2], points[3], tension));
 
             // Fill
-            bmp.FillPolygon(list.ToArray(), color);
+            bmp.FillPolygon([.. list], color);
         }
 
         #endregion

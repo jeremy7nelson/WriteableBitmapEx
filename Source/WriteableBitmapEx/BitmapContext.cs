@@ -41,7 +41,7 @@ namespace System.Windows.Media.Imaging
     /// A disposable cross-platform wrapper around a WriteableBitmap, allowing a common API for Silverlight + WPF with locking + unlocking if necessary
     /// </summary>
     /// <remarks>Attempting to put as many preprocessor hacks in this file, to keep the rest of the codebase relatively clean</remarks>
-    public unsafe struct BitmapContext : IDisposable
+    public readonly unsafe struct BitmapContext : IDisposable
     {
         private readonly ReadWriteMode _mode;
         private static readonly IDictionary<WriteableBitmap, int> UpdateCountByBmp = new ConcurrentDictionary<WriteableBitmap, int>();

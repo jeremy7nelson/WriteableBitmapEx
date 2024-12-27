@@ -46,8 +46,8 @@ namespace System.Windows.Media.Imaging
 
             if (y1 > y2)
             {
-                Swap(ref x1, ref x2);
-                Swap(ref y1, ref y2);
+                (x2, x1) = (x1, x2);
+                (y2, y1) = (y1, y2);
             }
 
             if (x1 == x2)
@@ -128,7 +128,7 @@ namespace System.Windows.Media.Imaging
             {
                 if (x1 > x2)
                 {
-                    Swap(ref x1, ref x2);
+                    (x2, x1) = (x1, x2);
                 }
 
                 y1 -= (int)lineWidth / 2;
@@ -369,13 +369,6 @@ namespace System.Windows.Media.Imaging
             }
         }
 
-        private static void Swap<T>(ref T a, ref T b)
-        {
-            T t = a;
-            a = b;
-            b = t;
-        }
-
         private static void AALineQ1(int width, int height, BitmapContext context, int x1, int y1, int x2, int y2, int color, bool minEdge, bool leftEdge)
         {
             byte off = 0;
@@ -399,8 +392,8 @@ namespace System.Windows.Media.Imaging
 
             if (y1 > y2)
             {
-                Swap(ref x1, ref x2);
-                Swap(ref y1, ref y2);
+                (x2, x1) = (x1, x2);
+                (y2, y1) = (y1, y2);
             }
 
             int deltax = x2 - x1;

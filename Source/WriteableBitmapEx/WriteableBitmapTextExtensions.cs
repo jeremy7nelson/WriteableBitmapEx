@@ -47,7 +47,6 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">the color.</param>
         public static void FillGeometry(WriteableBitmap bmp, Geometry geometry, Color color)
         {
-
             if (geometry is GeometryGroup gp)
             {
                 foreach (var itm in gp.Children)
@@ -64,12 +63,11 @@ namespace System.Windows.Media.Imaging
                 foreach (var fig in pg.Figures)
                 {
                     ToWriteableBitmapPolygon(fig, poly);
-                    polygons.Add(poly.ToArray());
+                    polygons.Add([.. poly]);
                 }
 
-                bmp.FillPolygonsEvenOdd(polygons.ToArray(), color);
+                bmp.FillPolygonsEvenOdd([.. polygons], color);
             }
-
         }
 
         #endregion
@@ -129,7 +127,7 @@ namespace System.Windows.Media.Imaging
                 foreach (var fig in pg.Figures)
                 {
                     ToWriteableBitmapPolygon(fig, poly);
-                    polygons.Add(poly.ToArray());
+                    polygons.Add([.. poly]);
                 }
 
                 foreach (var item in polygons)
@@ -157,7 +155,7 @@ namespace System.Windows.Media.Imaging
                 foreach (var fig in pg.Figures)
                 {
                     ToWriteableBitmapPolygon(fig, poly);
-                    polygons.Add(poly.ToArray());
+                    polygons.Add([.. poly]);
                 }
 
                 foreach (var item in polygons)

@@ -319,12 +319,8 @@ namespace System.Windows.Media.Imaging
             { // x increases by +/- 1
                 if (dx < 0)
                 {
-                    int t = x1;
-                    x1 = x2;
-                    x2 = t;
-                    t = y1;
-                    y1 = y2;
-                    y2 = t;
+                    (x2, x1) = (x1, x2);
+                    (y2, y1) = (y1, y2);
                 }
 
                 // Init steps and start
@@ -434,12 +430,8 @@ namespace System.Windows.Media.Imaging
                 }
                 if (dy < 0)
                 {
-                    int t = x1;
-                    x1 = x2;
-                    x2 = t;
-                    t = y1;
-                    y1 = y2;
-                    y2 = t;
+                    (x2, x1) = (x1, x2);
+                    (y2, y1) = (y1, y2);
                 }
 
                 // Init steps and start
