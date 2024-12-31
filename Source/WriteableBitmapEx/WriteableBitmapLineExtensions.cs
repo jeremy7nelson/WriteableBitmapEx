@@ -270,7 +270,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a colored line by connecting two points using an optimized DDA. 
+        /// Draws a colored line by connecting two points using an optimized DDA.
         /// Uses the pixels array and the width directly for best performance.
         /// </summary>
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
@@ -535,7 +535,7 @@ namespace System.Windows.Media.Imaging
         private const byte TOP = 8;    // 1000
 
         /// <summary>
-        /// Draws a line using a pen / stamp for the line 
+        /// Draws a line using a pen / stamp for the line
         /// </summary>
         /// <param name="bmp">The WriteableBitmap containing the pixels as int RGBA value.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
@@ -552,7 +552,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a line using a pen / stamp for the line 
+        /// Draws a line using a pen / stamp for the line
         /// </summary>
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
         /// <param name="w">The width of one scanline in the pixels array.</param>
@@ -1051,7 +1051,7 @@ namespace System.Windows.Media.Imaging
                 return;
             }
 
-            if (DeltaX == 0) // if vertical line 
+            if (DeltaX == 0) // if vertical line
             {
                 do
                 {
@@ -1075,19 +1075,19 @@ namespace System.Windows.Media.Imaging
             // Line is not horizontal, diagonal, or vertical
             ErrorAcc = 0;  // initialize the line error accumulator to 0
 
-            // Is this an X-major or Y-major line? 
+            // Is this an X-major or Y-major line?
             if (DeltaY > DeltaX)
             {
                 // Y-major line; calculate 16-bit fixed-point fractional part of a
                 // pixel that X advances each time Y advances 1 pixel, truncating the
-                // result so that we won't overrun the endpoint along the X axis 
+                // result so that we won't overrun the endpoint along the X axis
                 ErrorAdj = (ushort)(((ulong)DeltaX << 16) / (ulong)DeltaY);
 
-                // Draw all pixels other than the first and last 
+                // Draw all pixels other than the first and last
                 while (--DeltaY != 0)
                 {
-                    ErrorAccTemp = ErrorAcc;   // remember current accumulated error 
-                    ErrorAcc += ErrorAdj;      // calculate error for next pixel 
+                    ErrorAccTemp = ErrorAcc;   // remember current accumulated error
+                    ErrorAcc += ErrorAdj;      // calculate error for next pixel
                     if (ErrorAcc <= ErrorAccTemp)
                     {
                         // The error accumulator turned over, so advance the X coord */
@@ -1096,7 +1096,7 @@ namespace System.Windows.Media.Imaging
                     y1++; /* Y-major, so always advance Y */
                     // The IntensityBits most significant bits of ErrorAcc give us the
                     // intensity weighting for this pixel, and the complement of the
-                    // weighting for the paired pixel 
+                    // weighting for the paired pixel
                     Weighting = (ushort)(ErrorAcc >> INTENSITY_SHIFT);
 
                     int weight = Weighting ^ WEIGHT_COMPLEMENT_MASK;
@@ -1119,20 +1119,20 @@ namespace System.Windows.Media.Imaging
             // result to avoid overrunning the endpoint along the X axis */
             ErrorAdj = (ushort)(((ulong)DeltaY << 16) / (ulong)DeltaX);
 
-            // Draw all pixels other than the first and last 
+            // Draw all pixels other than the first and last
             while (--DeltaX != 0)
             {
-                ErrorAccTemp = ErrorAcc;   // remember current accumulated error 
-                ErrorAcc += ErrorAdj;      // calculate error for next pixel 
+                ErrorAccTemp = ErrorAcc;   // remember current accumulated error
+                ErrorAcc += ErrorAdj;      // calculate error for next pixel
                 if (ErrorAcc <= ErrorAccTemp) // if error accumulator turned over
                 {
                     // advance the Y coord
                     y1++;
                 }
-                x1 += XDir; // X-major, so always advance X 
+                x1 += XDir; // X-major, so always advance X
                 // The IntensityBits most significant bits of ErrorAcc give us the
                 // intensity weighting for this pixel, and the complement of the
-                // weighting for the paired pixel 
+                // weighting for the paired pixel
                 Weighting = (ushort)(ErrorAcc >> INTENSITY_SHIFT);
 
                 int weight = Weighting ^ WEIGHT_COMPLEMENT_MASK;
@@ -1145,12 +1145,12 @@ namespace System.Windows.Media.Imaging
                 //bitmap.SetPixel(X0, Y0 + 1,
                 //      255 - (BaseColor + (Weighting ^ WeightingComplementMask)));
             }
-            // Draw the final pixel, which is always exactly intersected by the line and thus needs no weighting 
+            // Draw the final pixel, which is always exactly intersected by the line and thus needs no weighting
             pixels[(y2 * pixelWidth) + x2] = AlphaBlend(sa, sr, sg, sb, pixels[(y2 * pixelWidth) + x2]);
             //bitmap.SetPixel(X1, Y1, BaseColor);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
         /// <param name="pixelWidth">The width of one scanline in the pixels array.</param>
@@ -1168,7 +1168,7 @@ namespace System.Windows.Media.Imaging
             AAWidthLine(pixelWidth, pixelHeight, context, x1, y1, x2, y2, strokeThickness, color, clipRect);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
@@ -1185,7 +1185,7 @@ namespace System.Windows.Media.Imaging
             AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, color, clipRect);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
         /// <param name="pixelWidth">The width of one scanline in the pixels array.</param>
@@ -1204,7 +1204,7 @@ namespace System.Windows.Media.Imaging
             AAWidthLine(pixelWidth, pixelHeight, context, x1, y1, x2, y2, strokeThickness, col, clipRect);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Draws an anti-aliased line with a desired stroke thickness
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
@@ -1222,8 +1222,8 @@ namespace System.Windows.Media.Imaging
             AAWidthLine(context.Width, context.Height, context, x1, y1, x2, y2, strokeThickness, col, clipRect);
         }
 
-        /// <summary> 
-        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm 
+        /// <summary>
+        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm
         /// From http://nokola.com/blog/post/2010/10/14/Anti-aliased-Lines-And-Optimizing-Code-for-Windows-Phone-7e28093First-Look.aspx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
@@ -1232,15 +1232,15 @@ namespace System.Windows.Media.Imaging
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        /// </summary> 
+        /// </summary>
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, Color color, Rect? clipRect = null)
         {
             var col = ConvertColor(color);
             bmp.DrawLineAa(x1, y1, x2, y2, col, clipRect);
         }
 
-        /// <summary> 
-        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm 
+        /// <summary>
+        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm
         /// From http://nokola.com/blog/post/2010/10/14/Anti-aliased-Lines-And-Optimizing-Code-for-Windows-Phone-7e28093First-Look.aspx
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="x1">The x-coordinate of the start point.</param>
@@ -1249,15 +1249,15 @@ namespace System.Windows.Media.Imaging
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        /// </summary> 
+        /// </summary>
         public static void DrawLineAa(this WriteableBitmap bmp, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
             using var context = bmp.GetBitmapContext();
             DrawLineAa(context, context.Width, context.Height, x1, y1, x2, y2, color, clipRect);
         }
 
-        /// <summary> 
-        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm 
+        /// <summary>
+        /// Draws an anti-aliased line, using an optimized version of Gupta-Sproull algorithm
         /// From http://nokola.com/blog/post/2010/10/14/Anti-aliased-Lines-And-Optimizing-Code-for-Windows-Phone-7e28093First-Look.aspx
         /// <param name="context">The context containing the pixels as int RGBA value.</param>
         /// <param name="pixelWidth">The width of one scanline in the pixels array.</param>
@@ -1268,7 +1268,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="y2">The y-coordinate of the end point.</param>
         /// <param name="color">The color for the line.</param>
         /// <param name="clipRect">The region in the image to restrict drawing to.</param>
-        /// </summary> 
+        /// </summary>
         public static void DrawLineAa(BitmapContext context, int pixelWidth, int pixelHeight, int x1, int y1, int x2, int y2, int color, Rect? clipRect = null)
         {
             if ((x1 == x2) && (y1 == y2))
@@ -1338,7 +1338,7 @@ namespace System.Windows.Media.Imaging
             var srb = (uint)(color & 0x00FF00FF);
             var sg = (uint)((color >> 8) & 0xFF);
 
-            // By switching to (u,v), we combine all eight octants 
+            // By switching to (u,v), we combine all eight octants
             int adx = dx, ady = dy;
             if (dx < 0)
             {
@@ -1417,14 +1417,14 @@ namespace System.Windows.Media.Imaging
 
                 if (d < 0)
                 {
-                    // choose straight (u direction) 
+                    // choose straight (u direction)
                     twovduMulInvD = dMulInvD + duMulInvD;
                     d += incrS;
                     dMulInvD += incrSMulInvD;
                 }
                 else
                 {
-                    // choose diagonal (u+v direction) 
+                    // choose diagonal (u+v direction)
                     twovduMulInvD = dMulInvD - duMulInvD;
                     d += incrD;
                     dMulInvD += incrDMulInvD;
@@ -1436,9 +1436,9 @@ namespace System.Windows.Media.Imaging
             } while (u <= uend);
         }
 
-        /// <summary> 
+        /// <summary>
         /// Blends a specific source color on top of a destination premultiplied color
-        /// </summary> 
+        /// </summary>
         /// <param name="context">Array containing destination color</param>
         /// <param name="index">Index of destination pixel</param>
         /// <param name="sa">Source alpha (0..255)</param>
@@ -1472,7 +1472,7 @@ namespace System.Windows.Media.Imaging
             return CohenSutherlandLineClip(viewPortWithOffset, ref xi0, ref yi0, ref xi1, ref yi1);
         }
 
-        internal static bool CohenSutherlandLineClip(Rect extents, ref float xi0, ref float yi0, ref float xi1, ref float yi1)
+        public static bool CohenSutherlandLineClip(Rect extents, ref float xi0, ref float yi0, ref float xi1, ref float yi1)
         {
             // Fix #SC-1555: Log(0) issue
             // CohenSuzerland line clipping algorithm returns NaN when point has infinity value
@@ -1497,7 +1497,7 @@ namespace System.Windows.Media.Imaging
             return d > int.MaxValue ? int.MaxValue : d < int.MinValue ? int.MinValue : d;
         }
 
-        internal static bool CohenSutherlandLineClip(Rect extents, ref int xi0, ref int yi0, ref int xi1, ref int yi1)
+        public static bool CohenSutherlandLineClip(Rect extents, ref int xi0, ref int yi0, ref int xi1, ref int yi1)
         {
             double x0 = xi0;
             double y0 = yi0;
@@ -1517,12 +1517,12 @@ namespace System.Windows.Media.Imaging
 
         /// <summary>
         /// Cohen–Sutherland clipping algorithm clips a line from
-        /// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with 
+        /// P0 = (x0, y0) to P1 = (x1, y1) against a rectangle with
         /// diagonal from (xmin, ymin) to (xmax, ymax).
         /// </summary>
         /// <remarks>See http://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm for details</remarks>
         /// <returns>a list of two points in the resulting clipped line, or zero</returns>
-        internal static bool CohenSutherlandLineClip(Rect extents, ref double x0, ref double y0, ref double x1, ref double y1)
+        public static bool CohenSutherlandLineClip(Rect extents, ref double x0, ref double y0, ref double x1, ref double y1)
         {
             // compute outcodes for P0, P1, and whatever point lies outside the clip rectangle
             byte outcode0 = ComputeOutCode(extents, x0, y0);

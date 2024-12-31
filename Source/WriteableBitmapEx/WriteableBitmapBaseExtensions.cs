@@ -123,7 +123,7 @@ namespace System.Windows.Media.Imaging
         #region ForEach
 
         /// <summary>
-        /// Applies the given function to all the pixels of the bitmap in 
+        /// Applies the given function to all the pixels of the bitmap in
         /// order to set their color.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -147,7 +147,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Applies the given function to all the pixels of the bitmap in 
+        /// Applies the given function to all the pixels of the bitmap in
         /// order to set their color.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -192,7 +192,7 @@ namespace System.Windows.Media.Imaging
         #region Get Pixel / Brightness
 
         /// <summary>
-        /// Gets the color of the pixel at the x, y coordinate as integer.  
+        /// Gets the color of the pixel at the x, y coordinate as integer.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -206,7 +206,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Gets the color of the pixel at the x, y coordinate as a Color struct.  
+        /// Gets the color of the pixel at the x, y coordinate as a Color struct.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -261,7 +261,7 @@ namespace System.Windows.Media.Imaging
         #region Without alpha
 
         /// <summary>
-        /// Sets the color of the pixel using a precalculated index (faster). 
+        /// Sets the color of the pixel using a precalculated index (faster).
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -276,7 +276,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel. 
+        /// Sets the color of the pixel.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -296,7 +296,7 @@ namespace System.Windows.Media.Imaging
         #region With alpha
 
         /// <summary>
-        /// Sets the color of the pixel including the alpha value and using a precalculated index (faster). 
+        /// Sets the color of the pixel including the alpha value and using a precalculated index (faster).
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -312,7 +312,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel including the alpha value. 
+        /// Sets the color of the pixel including the alpha value.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -333,7 +333,7 @@ namespace System.Windows.Media.Imaging
         #region With System.Windows.Media.Color
 
         /// <summary>
-        /// Sets the color of the pixel using a precalculated index (faster). 
+        /// Sets the color of the pixel using a precalculated index (faster).
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -346,7 +346,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel. 
+        /// Sets the color of the pixel.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -360,7 +360,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel using an extra alpha value and a precalculated index (faster). 
+        /// Sets the color of the pixel using an extra alpha value and a precalculated index (faster).
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -379,7 +379,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel using an extra alpha value. 
+        /// Sets the color of the pixel using an extra alpha value.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -399,7 +399,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel using a precalculated index (faster).  
+        /// Sets the color of the pixel using a precalculated index (faster).
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -412,7 +412,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Sets the color of the pixel. 
+        /// Sets the color of the pixel.
         /// For best performance this method should not be used in iterative real-time scenarios. Implement the code directly inside a loop.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>

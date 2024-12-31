@@ -92,9 +92,11 @@ namespace System.Windows.Media.Imaging
             //swap values
             if (y1 > y2)
             {
-                y2 -= y1;
-                y1 += y2;
-                y2 = y1 - y2;
+                (y1, y2) = (y2, y1);
+            }
+            if (x1 > x2)
+            {
+                (x1, x2) = (x2, x1);
             }
 
             // Fill first line
@@ -144,13 +146,12 @@ namespace System.Windows.Media.Imaging
             return destPixel;
         }
 
-
         #endregion
 
         #region Ellipse
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// x2 has to be greater than x1 and y2 has to be greater than y1.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -166,7 +167,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// x2 has to be greater than x1 and y2 has to be greater than y1.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -186,7 +187,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// Uses a different parameter representation than DrawEllipse().
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -203,7 +204,7 @@ namespace System.Windows.Media.Imaging
 
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf  
+        /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// With or without alpha blending (default = false).
         /// Uses a different parameter representation than DrawEllipse().
         /// </summary>
@@ -492,7 +493,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a filled polygon with or without alpha blending (default = false). 
+        /// Draws a filled polygon with or without alpha blending (default = false).
         /// Add the first point also at the end of the array if the line should be closed.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -571,7 +572,7 @@ namespace System.Windows.Media.Imaging
                     vyi = vyj;
                 }
 
-                // Sort the intersections from left to right using Insertion sort 
+                // Sort the intersections from left to right using Insertion sort
                 // It's faster than Array.Sort for this small data set
                 int t, j;
                 for (int i = 1; i < intersectionCount; i++)
@@ -622,7 +623,7 @@ namespace System.Windows.Media.Imaging
         /// Helper class for storing the data of an edge.
         /// </summary>
         /// <remarks>
-        /// The following is always true: 
+        /// The following is always true:
         /// <code>edge.StartY &lt; edge.EndY</code>
         /// </remarks>
         private sealed class Edge : IComparable<Edge>
@@ -682,7 +683,7 @@ namespace System.Windows.Media.Imaging
             /// Compares the current object with another object of the same type.
             /// </summary>
             /// <returns>
-            /// A 32-bit signed integer that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
+            /// A 32-bit signed integer that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>.
             /// </returns>
             /// <param name="other">An object to compare with this object.</param>
             public int CompareTo(Edge other)
@@ -700,9 +701,9 @@ namespace System.Windows.Media.Imaging
         /// Polygons are implicitly closed if necessary.
         /// </remarks>
         /// <param name="bmp">The WriteableBitmap.</param>
-        /// <param name="polygons">Array of polygons. 
-        /// The different polygons are identified by the first index, 
-        /// while the points of each polygon are in x and y pairs indexed by the second index, 
+        /// <param name="polygons">Array of polygons.
+        /// The different polygons are identified by the first index,
+        /// while the points of each polygon are in x and y pairs indexed by the second index,
         /// therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).
         /// </param>
         /// <param name="color">The color for the polygon.</param>
@@ -719,9 +720,9 @@ namespace System.Windows.Media.Imaging
         /// Polygons are implicitly closed if necessary.
         /// </remarks>
         /// <param name="bmp">The WriteableBitmap.</param>
-        /// <param name="polygons">Array of polygons. 
-        /// The different polygons are identified by the first index, 
-        /// while the points of each polygon are in x and y pairs indexed by the second index, 
+        /// <param name="polygons">Array of polygons.
+        /// The different polygons are identified by the first index,
+        /// while the points of each polygon are in x and y pairs indexed by the second index,
         /// therefore the array is interpreted as (x1, y1, x2, y2, ..., xn, yn).
         /// </param>
         /// <param name="color">The color for the polygon.</param>
@@ -732,18 +733,18 @@ namespace System.Windows.Media.Imaging
             // Algorithm:
             // This is using a scanline algorithm which is kept similar to the one the FillPolygon() method is using,
             // but it is only comparing the edges with the scanline which are currently intersecting the line.
-            // To be able to do this it first builds a list of edges (var edges) from the polygons, which is then 
-            // sorted via by their minimal y coordinate. During the scanline run only the edges which can intersect 
-            // the current scanline are intersected to get the X coordinate of the intersection. These edges are kept 
+            // To be able to do this it first builds a list of edges (var edges) from the polygons, which is then
+            // sorted via by their minimal y coordinate. During the scanline run only the edges which can intersect
+            // the current scanline are intersected to get the X coordinate of the intersection. These edges are kept
             // in the list named currentEdges.
-            // Especially for larger sane(*) polygons this is a lot faster then the algorithm used in the FillPolygon() 
+            // Especially for larger sane(*) polygons this is a lot faster then the algorithm used in the FillPolygon()
             // method which is always comparing all edges with the scan line.
-            // And sorry: the constraint to explicitly make the polygon close before using the FillPolygon() method is 
+            // And sorry: the constraint to explicitly make the polygon close before using the FillPolygon() method is
             // stupid, as filling an unclosed polygon is not very useful.
             //
-            // (*) sane: the polygons in the FillSample speed test are not sane, because they contain a lot of very long 
-            //     nearly vertical lines. A sane example would be a letter 'o', in which case the currentEdges list is 
-            //     containing no more than 4 edges at any moment, regardless of the smoothness of the rendering of the 
+            // (*) sane: the polygons in the FillSample speed test are not sane, because they contain a lot of very long
+            //     nearly vertical lines. A sane example would be a letter 'o', in which case the currentEdges list is
+            //     containing no more than 4 edges at any moment, regardless of the smoothness of the rendering of the
             //     letter into two polygons.
 
             #endregion
@@ -864,7 +865,7 @@ namespace System.Windows.Media.Imaging
                         (int)(currentEdge.StartX + ((y - currentEdge.StartY) * currentEdge.Sloap));
                 }
 
-                // Sort the intersections from left to right using Insertion sort 
+                // Sort the intersections from left to right using Insertion sort
                 // It's faster than Array.Sort for this small data set
                 for (int i = 1; i < intersectionCount; i++)
                 {
@@ -999,7 +1000,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         /// <param name="context">The context with the pixels.</param>
         /// <param name="w">The width of the bitmap.</param>
-        /// <param name="h">The height of the bitmap.</param> 
+        /// <param name="h">The height of the bitmap.</param>
         [Obsolete("Obsolete, left for compatibility reasons. Please use List<int> ComputeBezierPoints(int x1, int y1, int cx1, int cy1, int cx2, int cy2, int x2, int y2) instead.")]
         private static List<int> ComputeBezierPoints(int x1, int y1, int cx1, int cy1, int cx2, int cy2, int x2, int y2, int color, BitmapContext context, int w, int h)
         {
@@ -1062,8 +1063,8 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a series of filled, cubic Beziér splines each defined by start, end and two control points. 
-        /// The ending point of the previous curve is used as starting point for the next. 
+        /// Draws a series of filled, cubic Beziér splines each defined by start, end and two control points.
+        /// The ending point of the previous curve is used as starting point for the next.
         /// Therefore the initial curve needs four points and the subsequent 3 (2 control and 1 end point).
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -1076,8 +1077,8 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a series of filled, cubic Beziér splines each defined by start, end and two control points. 
-        /// The ending point of the previous curve is used as starting point for the next. 
+        /// Draws a series of filled, cubic Beziér splines each defined by start, end and two control points.
+        /// The ending point of the previous curve is used as starting point for the next.
         /// Therefore the initial curve needs four points and the subsequent 3 (2 control and 1 end point).
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -1122,7 +1123,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         /// <param name="context">The context with the pixels.</param>
         /// <param name="w">The width of the bitmap.</param>
-        /// <param name="h">The height of the bitmap.</param> 
+        /// <param name="h">The height of the bitmap.</param>
         [Obsolete("Obsolete, left for compatibility reasons. Please use List<int> ComputeSegmentPoints(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, float tension) instead.")]
         private static List<int> ComputeSegmentPoints(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, float tension, int color, BitmapContext context, int w, int h)
         {
@@ -1194,7 +1195,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a filled Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a filled Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -1208,7 +1209,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a filled Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a filled Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -1238,7 +1239,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a filled, closed Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a filled, closed Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -1252,7 +1253,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a filled, closed Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a filled, closed Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>

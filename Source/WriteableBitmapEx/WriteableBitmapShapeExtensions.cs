@@ -319,7 +319,7 @@ namespace System.Windows.Media.Imaging
         #region Ellipse
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// x2 has to be greater than x1 and y2 has to be less than y1.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -335,7 +335,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// x2 has to be greater than x1 and y2 has to be less than y1.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -371,7 +371,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf 
+        /// A Fast Bresenham Type Algorithm For Drawing Ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// Uses a different parameter representation than DrawEllipse().
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>

@@ -215,7 +215,7 @@ namespace System.Windows.Media.Imaging
         #region Color transformations
 
         /// <summary>
-        /// Creates a new WriteableBitmap which is the grayscaled version of this one and returns it. The gray values are equal to the brightness values. 
+        /// Creates a new WriteableBitmap which is the grayscaled version of this one and returns it. The gray values are equal to the brightness values.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <returns>The new gray WriteableBitmap.</returns>

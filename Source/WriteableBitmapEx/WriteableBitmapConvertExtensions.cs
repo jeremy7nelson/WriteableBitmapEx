@@ -115,7 +115,7 @@ namespace System.Windows.Media.Imaging
         #region TGA File
 
         /// <summary>
-        /// Writes the WriteableBitmap as a TGA image to a stream. 
+        /// Writes the WriteableBitmap as a TGA image to a stream.
         /// Used with permission from Nokola: http://nokola.com/blog/post/2010/01/21/Quick-and-Dirty-Output-of-WriteableBitmap-as-TGA-Image.aspx
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>

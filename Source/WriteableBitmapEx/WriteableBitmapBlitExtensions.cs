@@ -31,7 +31,7 @@ namespace System.Windows.Media.Imaging
         public enum BlendMode
         {
             /// <summary>
-            /// Alpha blending uses the alpha channel to combine the source and destination. 
+            /// Alpha blending uses the alpha channel to combine the source and destination.
             /// </summary>
             Alpha,
 
@@ -187,7 +187,7 @@ namespace System.Windows.Media.Imaging
                     sourcePixel = sourcePixels[0];
 
                     // Scanline BlockCopy is much faster (3.5x) if no tinting and blending is needed,
-                    // even for smaller sprites like the 32x32 particles. 
+                    // even for smaller sprites like the 32x32 particles.
                     if (blendMode == BlendMode.None && !tinted)
                     {
                         sourceIdx = (int)ii + ((int)jj * sourceWidth);

@@ -117,8 +117,8 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a series of cubic Beziér splines each defined by start, end and two control points. 
-        /// The ending point of the previous curve is used as starting point for the next. 
+        /// Draws a series of cubic Beziér splines each defined by start, end and two control points.
+        /// The ending point of the previous curve is used as starting point for the next.
         /// Therefore the initial curve needs four points and the subsequent 3 (2 control and 1 end point).
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -131,8 +131,8 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a series of cubic Beziér splines each defined by start, end and two control points. 
-        /// The ending point of the previous curve is used as starting point for the next. 
+        /// Draws a series of cubic Beziér splines each defined by start, end and two control points.
+        /// The ending point of the previous curve is used as starting point for the next.
         /// Therefore the initial curve needs four points and the subsequent 3 (2 control and 1 end point).
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -172,7 +172,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="color">The color.</param>
         /// <param name="context">The pixel context.</param>
         /// <param name="w">The width of the bitmap.</param>
-        /// <param name="h">The height of the bitmap.</param> 
+        /// <param name="h">The height of the bitmap.</param>
         private static void DrawCurveSegment(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, float tension, int color, BitmapContext context, int w, int h)
         {
             // Determine distances between controls points (bounding rect) to find the optimal stepsize
@@ -228,7 +228,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -242,7 +242,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -271,7 +271,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a closed Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a closed Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
@@ -285,7 +285,7 @@ namespace System.Windows.Media.Imaging
         }
 
         /// <summary>
-        /// Draws a closed Cardinal spline (cubic) defined by a point collection. 
+        /// Draws a closed Cardinal spline (cubic) defined by a point collection.
         /// The cardinal spline passes through each point in the collection.
         /// </summary>
         /// <param name="bmp">The WriteableBitmap.</param>
