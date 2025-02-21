@@ -202,7 +202,6 @@ namespace System.Windows.Media.Imaging
             bmp.FillEllipseCentered(xc, yc, xr, yr, col);
         }
 
-
         /// <summary>
         /// A Fast Bresenham Type Algorithm For Drawing filled ellipses http://homepage.smc.edu/kennedy_john/belipse.pdf
         /// With or without alpha blending (default = false).
@@ -333,7 +332,6 @@ namespace System.Windows.Media.Imaging
                         pixels[i + lh] = AlphaBlendColors(pixels[i + lh], sa, sr, sg, sb);
                     }
                 }
-
 
                 y++;
                 yStopping += xrSqTwo;

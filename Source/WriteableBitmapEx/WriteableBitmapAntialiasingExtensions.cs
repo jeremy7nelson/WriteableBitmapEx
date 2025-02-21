@@ -296,7 +296,6 @@ namespace System.Windows.Media.Imaging
                 rightEdgeX[y] = 1 << (16 - 1);
             }
 
-
             AALineQ1(width, height, context, ix1, iy1, ix2, iy2, color, sy > 0, false);
             AALineQ1(width, height, context, ix3, iy3, ix4, iy4, color, sy < 0, true);
 

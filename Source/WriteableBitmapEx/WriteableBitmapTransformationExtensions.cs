@@ -242,7 +242,6 @@ namespace System.Windows.Media.Imaging
                             y1 = y0;
                         }
 
-
                         // Read source color
                         c = pixels[(y0 * widthSource) + x0];
                         c1a = (byte)(c >> 24);
@@ -267,7 +266,6 @@ namespace System.Windows.Media.Imaging
                         c4r = (byte)(c >> 16);
                         c4g = (byte)(c >> 8);
                         c4b = (byte)c;
-
 
                         // Calculate colors
                         // Alpha
