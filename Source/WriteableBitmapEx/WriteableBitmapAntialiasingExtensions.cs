@@ -50,6 +50,18 @@ namespace System.Windows.Media.Imaging
                 (y2, y1) = (y1, y2);
             }
 
+            byte rs, gs, bs, @as;//input color components
+
+            {
+                @as = (byte)((color & 0xff000000) >> 24);
+                @rs = (byte)((color & 0x00ff0000) >> 16);
+                @gs = (byte)((color & 0x0000ff00) >> 8);
+                @bs = (byte)((color & 0x000000ff) >> 0);
+            }
+
+            byte rd, gd, bd, ad; //ARGB components of each pixel
+            int d; //combined ARGB component of each pixel, the destination pixel
+
             if (x1 == x2)
             {
                 x1 -= (int)lineWidth / 2;
@@ -94,36 +106,22 @@ namespace System.Windows.Media.Imaging
                 {
                     for (var y = (int)y1; y <= y2; y++)
                     {
-                        var a = (byte)((color & 0xff000000) >> 24);
-                        var r = (byte)((color & 0x00ff0000) >> 16);
-                        var g = (byte)((color & 0x0000ff00) >> 8);
-                        var b = (byte)((color & 0x000000ff) >> 0);
-
-                        byte rs, gs, bs;
-                        byte rd, gd, bd;
-
-                        int d;
-
-                        rs = r;
-                        gs = g;
-                        bs = b;
-
                         d = buffer[(y * width) + x];
 
+                        ad = (byte)((d & 0xff000000) >> 24);
                         rd = (byte)((d & 0x00ff0000) >> 16);
                         gd = (byte)((d & 0x0000ff00) >> 8);
                         bd = (byte)((d & 0x000000ff) >> 0);
 
-                        rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
-                        gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
-                        bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
+                        d = AlphaBlendArgbPixels(@as, rs, gs, bs, ad, rd, gd, bd);
 
-                        buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                        buffer[(y * width) + x] = d;
                     }
                 }
 
                 return;
             }
+
             if (y1 == y2)
             {
                 if (x1 > x2)
@@ -173,31 +171,16 @@ namespace System.Windows.Media.Imaging
                 {
                     for (var y = (int)y1; y <= y2; y++)
                     {
-                        var a = (byte)((color & 0xff000000) >> 24);
-                        var r = (byte)((color & 0x00ff0000) >> 16);
-                        var g = (byte)((color & 0x0000ff00) >> 8);
-                        var b = (byte)((color & 0x000000ff) >> 0);
-
-                        byte rs, gs, bs;
-                        byte rd, gd, bd;
-
-                        int d;
-
-                        rs = r;
-                        gs = g;
-                        bs = b;
-
                         d = buffer[(y * width) + x];
 
+                        ad = (byte)((d & 0xff000000) >> 24);
                         rd = (byte)((d & 0x00ff0000) >> 16);
                         gd = (byte)((d & 0x0000ff00) >> 8);
                         bd = (byte)((d & 0x000000ff) >> 0);
 
-                        rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
-                        gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
-                        bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
+                        d = AlphaBlendArgbPixels(@as, rs, gs, bs, ad, rd, gd, bd);
 
-                        buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                        buffer[(y * width) + x] = d;
                     }
                 }
 
@@ -227,9 +210,6 @@ namespace System.Windows.Media.Imaging
             y1 -= ytot / 2;
             x2 += xtot / 2;
             y2 -= ytot / 2;
-
-            //
-            //
 
             float sx = -xtot;
             float sy = +ytot;
@@ -339,31 +319,16 @@ namespace System.Windows.Media.Imaging
 
                 for (int x = leftEdgeX[y]; x <= rightEdgeX[y]; x++)
                 {
-                    var a = (byte)((color & 0xff000000) >> 24);
-                    var r = (byte)((color & 0x00ff0000) >> 16);
-                    var g = (byte)((color & 0x0000ff00) >> 8);
-                    var b = (byte)((color & 0x000000ff) >> 0);
-
-                    byte rs, gs, bs;
-                    byte rd, gd, bd;
-
-                    int d;
-
-                    rs = r;
-                    gs = g;
-                    bs = b;
-
                     d = buffer[(y * width) + x];
 
+                    ad = (byte)((d & 0xff000000) >> 24);
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)(((rs * a) + (rd * (0xff - a))) >> 8);
-                    gd = (byte)(((gs * a) + (gd * (0xff - a))) >> 8);
-                    bd = (byte)(((bs * a) + (bd * (0xff - a))) >> 8);
+                    d = AlphaBlendArgbPixels(@as, rs, gs, bs, ad, rd, gd, bd);
 
-                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                    buffer[(y * width) + x] = d;
                 }
             }
         }
@@ -409,17 +374,20 @@ namespace System.Windows.Media.Imaging
             ushort m = deltax > deltay ? (ushort)((deltay << 16) / deltax) : (ushort)((deltax << 16) / deltay);
             ushort e = 0;
 
-            var a = (byte)((color & 0xff000000) >> 24);
-            var r = (byte)((color & 0x00ff0000) >> 16);
-            var g = (byte)((color & 0x0000ff00) >> 8);
-            var b = (byte)((color & 0x000000ff) >> 0);
+            byte rs, gs, bs, @as;
 
-            byte rs, gs, bs;
-            byte rd, gd, bd;
+            {
+                @as = (byte)((color & 0xff000000) >> 24);
+                rs = (byte)((color & 0x00ff0000) >> 16);
+                gs = (byte)((color & 0x0000ff00) >> 8);
+                bs = (byte)((color & 0x000000ff) >> 0);
+            }
+
+            byte rd, gd, bd, ad;
 
             int d;
 
-            byte ta = a;
+            byte ta = @as;
 
             e = 0;
 
@@ -462,27 +430,18 @@ namespace System.Windows.Media.Imaging
                         continue;
                     }
 
-                    //
-
-                    ta = (byte)((a * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8);
-
-                    rs = r;
-                    gs = g;
-                    bs = b;
+                    ta = (byte)((@as * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8); //target alpha
 
                     d = buffer[(y * width) + x];
 
+                    ad = (byte)((d & 0xff000000) >> 24);
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)(((rs * ta) + (rd * (0xff - ta))) >> 8);
-                    gd = (byte)(((gs * ta) + (gd * (0xff - ta))) >> 8);
-                    bd = (byte)(((bs * ta) + (bd * (0xff - ta))) >> 8);
+                    d = AlphaBlendArgbPixels(@as, rs, gs, bs, ad, rd, gd, bd);
 
-                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
-
-                    //
+                    buffer[(y * width) + x] = d;
                 }
             }
             else
@@ -517,25 +476,18 @@ namespace System.Windows.Media.Imaging
                         continue;
                     }
 
-                    //
-
-                    ta = (byte)((a * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8);
-
-                    rs = r;
-                    gs = g;
-                    bs = b;
+                    ta = (byte)((@as * (ushort)(((ushort)(e >> 8)) ^ off)) >> 8);
 
                     d = buffer[(y * width) + x];
 
+                    ad = (byte)((d & 0xff000000) >> 24);
                     rd = (byte)((d & 0x00ff0000) >> 16);
                     gd = (byte)((d & 0x0000ff00) >> 8);
                     bd = (byte)((d & 0x000000ff) >> 0);
 
-                    rd = (byte)(((rs * ta) + (rd * (0xff - ta))) >> 8);
-                    gd = (byte)(((gs * ta) + (gd * (0xff - ta))) >> 8);
-                    bd = (byte)(((bs * ta) + (bd * (0xff - ta))) >> 8);
+                    d = AlphaBlendArgbPixels(@as, rs, gs, bs, ad, rd, gd, bd);
 
-                    buffer[(y * width) + x] = (0xff << 24) | (rd << 16) | (gd << 8) | (bd << 0);
+                    buffer[(y * width) + x] = d;
 
                     if (leftEdge)
                     {
