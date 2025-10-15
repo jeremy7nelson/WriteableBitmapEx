@@ -319,7 +319,7 @@ namespace System.Windows.Media.Imaging
             var h = context.Height;
             var p = context.Pixels;
             var i = 0;
-            WriteableBitmap result = null;
+            WriteableBitmap? result = null;
             angle %= 360;
 
             if (angle is > 0 and <= 90)
@@ -576,7 +576,7 @@ namespace System.Windows.Media.Imaging
         /// <param name="bmp">The WriteableBitmap.</param>
         /// <param name="flipMode">The flip mode.</param>
         /// <returns>A new WriteableBitmap that is a flipped version of the input.</returns>
-        public static WriteableBitmap Flip(this WriteableBitmap bmp, FlipMode flipMode)
+        public static WriteableBitmap? Flip(this WriteableBitmap bmp, FlipMode flipMode)
         {
             using var context = bmp.GetBitmapContext(ReadWriteMode.ReadOnly);
             // Use refs for faster access (really important!) speeds up a lot!
@@ -584,7 +584,7 @@ namespace System.Windows.Media.Imaging
             var h = context.Height;
             var p = context.Pixels;
             var i = 0;
-            WriteableBitmap result = null;
+            WriteableBitmap? result = null;
 
             if (flipMode == FlipMode.Horizontal)
             {
